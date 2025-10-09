@@ -1,15 +1,14 @@
-import Image from "next/image";
 import Link from "next/link";
 
-export default function Home() {
+export default function About() {
   return (
     <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
       <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <h1 className="text-4xl font-bold">Kasper</h1>
-        <p className="text-lg">I&apos;m building my world.</p>
-        <Link href="/about">
-          <button className="px-6 py-3 bg-blue-400 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium">
-            Go to About Page
+        <h1 className="text-4xl font-bold">About Page</h1>
+        <p className="text-lg">Welcome to the about page!</p>
+        <Link href="/">
+          <button className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium">
+            Back to Home
           </button>
         </Link>
       </main>
