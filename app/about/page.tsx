@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function About() {
   return (
     <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
@@ -12,14 +14,14 @@ export default function About() {
         </div>
         <p> contact me: kasperr.pan@gmail.com</p>
         <p>
-          here is my website: <a href="/">https://kasperbuild.com</a>
+          here is my website: <Link href="/">https://kasperbuild.com</Link>
         </p>
-        <a
+        <Link
           href="/"
           className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors"
         >
           Back to Home
-        </a>
+        </Link>
       </main>
     </div>
   );
