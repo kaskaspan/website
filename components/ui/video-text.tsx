@@ -43,7 +43,7 @@ export function VideoText({ children, src, className }: VideoTextProps) {
         playsInline
         className="absolute inset-0 w-full h-full object-cover"
       />
-      <div className="relative z-10 text-6xl font-bold text-white mix-blend-screen">
+      <div className="relative z-10 text-4xl sm:text-6xl font-bold text-white mix-blend-screen whitespace-nowrap">
         {children}
       </div>
     </div>

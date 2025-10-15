@@ -14,7 +14,7 @@ export default function About() {
         </div>
         <p> contact me: kasperr.pan@gmail.com</p>
         <p>
-          here is my website: <Link href="/">https://kasperbuild.com</Link>
+          here is my website: <Link href="/">https://kasper.build</Link>
         </p>
         <Link
           href="/"

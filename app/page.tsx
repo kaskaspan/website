@@ -17,7 +17,7 @@ export function SmoothCursorDemo() {
 
 export function VideoTextDemo() {
   return (
-    <div className="relative h-[200px] w-full overflow-hidden">
+    <div className="relative h-[200px] w-full max-w-4xl overflow-hidden">
       <VideoText src="https://cdn.magicui.design/ocean-small.webm">
         Kasper Pan
       </VideoText>
@@ -50,6 +50,9 @@ export default function Home() {
       <Globe className="absolute inset-0 mx-auto" />
       <main className="flex flex-col gap-[32px] row-start-2 items-center relative z-10">
         <VideoTextDemo />
+        {/* <h2 className="text-4xl font-bold">Kasper Pan</h2> */}
+        {/* <h2 className="text-4xl font-bold">Kasper Pan</h2> */}
+
         <p className="text-lg text-shadow-blue-500">
           I&apos;m building my world.
         </p>
