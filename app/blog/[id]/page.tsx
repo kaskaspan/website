@@ -1,5 +1,5 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
+import BlogPostClient from "./client";
 
 const blogPosts = [
   {
@@ -93,24 +93,7 @@ export default function BlogPost({ params }: { params: { id: string } }) {
     notFound();
   }
 
-  return (
-    <div className="font-sans min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="max-w-4xl mx-auto">
-        <article>
-          <h1 className="text-4xl font-bold mb-4">{post.title}</h1>
-          <p className="text-gray-500 text-sm mb-8">{post.date}</p>
-          <div className="prose prose-lg max-w-none">
-            <p className="text-gray-700 whitespace-pre-line">{post.content}</p>
-          </div>
-        </article>
-        <div className="mt-12 pt-8 border-t border-gray-200">
-          <Link href="/blog" className="text-blue-500 hover:underline">
-            ← Back to Blog
-          </Link>
-        </div>
-      </main>
-    </div>
-  );
+  return <BlogPostClient post={post} />;
 }
 
 export function generateStaticParams() {

@@ -1,9 +1,21 @@
 "use client";
 import Link from "next/link";
-import { ShineBorder } from "@/components/ui/shine-border";
 import { useEffect, useState } from "react";
 
-export default function Blog() {
+interface BlogPost {
+  id: number;
+  title: string;
+  date: string;
+  excerpt: string;
+  h1?: string;
+  content: string;
+}
+
+interface BlogPostClientProps {
+  post: BlogPost;
+}
+
+export default function BlogPostClient({ post }: BlogPostClientProps) {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
@@ -16,22 +28,6 @@ export default function Blog() {
       return () => window.removeEventListener("mousemove", handleMouseMove);
     }
   }, []);
-  const blogPosts = [
-    {
-      id: 1,
-      title: "My First Blog Post",
-      date: "October 10, 2025",
-      excerpt:
-        "This is my first blog post. I'm excited to share my thoughts with the world.",
-    },
-    {
-      id: 2,
-      title: "The 5 day of building my world",
-      date: "October 11, 2025",
-      excerpt:
-        "I am Kasper, and I am building my world, exploring the infinite possibilities of technology and creativity.",
-    },
-  ];
 
   return (
     <div className="font-sans relative min-h-screen overflow-hidden">
@@ -104,47 +100,27 @@ export default function Blog() {
       {/* Content */}
       <div className="relative z-10 min-h-screen p-8 pb-20 gap-16 sm:p-20">
         <main className="max-w-4xl mx-auto">
-          <div className="text-center sm:text-left mb-12">
-            <h1 className="text-6xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent mb-4">
-              My Blog
+          <article className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20">
+            <h1 className="text-5xl font-bold mb-4 bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent">
+              {post.title}
             </h1>
-            <div className="w-24 h-1 bg-gradient-to-r from-purple-500 to-blue-500 mx-auto sm:mx-0 mb-8" />
-          </div>
+            <p className="text-white/70 text-sm mb-8">{post.date}</p>
+            <div className="prose prose-lg max-w-none">
+              <p className="text-white/90 whitespace-pre-line leading-relaxed">
+                {post.content}
+              </p>
+            </div>
+          </article>
 
-          <div className="space-y-6">
-            {blogPosts.map((post) => (
-              <ShineBorder
-                key={post.id}
-                shineColor={["#A07CFE", "#FE8FB5", "#FFBE7B"]}
-                borderWidth={5}
-                className="rounded-lg"
-              >
-                <article className="bg-white/10 backdrop-blur-sm rounded-lg p-6 hover:bg-white/20 transition-all border border-white/20">
-                  <h2 className="text-2xl font-bold mb-2 text-white">
-                    {post.title}
-                  </h2>
-                  <p className="text-white/70 text-sm mb-4">{post.date}</p>
-                  <p className="text-white/90 mb-4">{post.excerpt}</p>
-                  <Link
-                    href={`/blog/${post.id}`}
-                    className="group inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600/20 to-blue-600/20 text-blue-400 hover:text-white hover:from-purple-600/40 hover:to-blue-600/40 rounded-full border border-blue-400/30 hover:border-purple-400/50 transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:shadow-purple-500/25"
-                  >
-                    <span>Read more</span>
-                    <span className="group-hover:translate-x-1 transition-transform duration-300">
-                      →
-                    </span>
-                  </Link>
-                </article>
-              </ShineBorder>
-            ))}
-          </div>
-
-          <div className="mt-8">
+          <div className="mt-12 pt-8 border-t border-white/20">
             <Link
-              href="/"
-              className="group relative px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-full hover:from-purple-700 hover:to-blue-700 transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:shadow-purple-500/25 inline-flex items-center gap-2"
+              href="/blog"
+              className="group inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600/20 to-blue-600/20 text-blue-400 hover:text-white hover:from-purple-600/40 hover:to-blue-600/40 rounded-full border border-blue-400/30 hover:border-purple-400/50 transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:shadow-purple-500/25"
             >
-              <span>← Back to Home</span>
+              <span className="group-hover:-translate-x-1 transition-transform duration-300">
+                ←
+              </span>
+              <span>Back to Blog</span>
             </Link>
           </div>
         </main>
