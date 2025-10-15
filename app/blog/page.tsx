@@ -1,7 +1,21 @@
+"use client";
 import Link from "next/link";
 import { ShineBorder } from "@/components/ui/shine-border";
+import { useEffect, useState } from "react";
 
 export default function Blog() {
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      setMousePosition({ x: e.clientX, y: e.clientY });
+    };
+
+    if (typeof window !== "undefined") {
+      window.addEventListener("mousemove", handleMouseMove);
+      return () => window.removeEventListener("mousemove", handleMouseMove);
+    }
+  }, []);
   const blogPosts = [
     {
       id: 1,
