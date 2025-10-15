@@ -25,19 +25,6 @@ export function VideoTextDemo() {
   );
 }
 
-function Layout({ children }: { children: React.ReactNode }) {
-  return (
-    <html>
-      <body>
-        <nav>
-          <Link href="/blog">Blog</Link>
-          <a href="/contact">Contact</a>
-        </nav>
-        {children}
-      </body>
-    </html>
-  );
-}
 export default function Home() {
   const router = useRouter();
 

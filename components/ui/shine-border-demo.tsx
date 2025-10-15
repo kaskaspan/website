@@ -14,10 +14,9 @@ import { ShineBorder } from "@/components/ui/shine-border";
 export function ShineBorderDemo() {
   return (
     <Card className="relative w-full max-w-[350px] overflow-hidden">
-      <ShineBorder
-        shineColor={["#A07CFE", "#FE8FB5", "#FFBE7B"]}
-        children={undefined}
-      />
+      <ShineBorder shineColor={["#A07CFE", "#FE8FB5", "#FFBE7B"]}>
+        <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-pink-500 opacity-10" />
+      </ShineBorder>
       <CardHeader>
         <CardTitle>Login</CardTitle>
         <CardDescription>
