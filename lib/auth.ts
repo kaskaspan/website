@@ -113,7 +113,7 @@ export function isAuthenticated(): boolean {
           isLoading: false,
         };
         return true;
-      } catch (error) {
+      } catch {
         // Invalid stored data, clear it
         logout();
         return false;
@@ -167,7 +167,7 @@ export function initializeAuth(): void {
         } else {
           logout();
         }
-      } catch (error) {
+      } catch {
         logout();
       }
     }

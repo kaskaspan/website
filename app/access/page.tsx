@@ -133,7 +133,7 @@ export default function Access() {
                 </li>
                 <li>The website is mobile-friendly and responsive</li>
                 <li>Make sure you have an internet connection</li>
-                <li>If the site doesn't load, try refreshing the page</li>
+                <li>If the site doesn&apos;t load, try refreshing the page</li>
               </ul>
             </div>
           </div>

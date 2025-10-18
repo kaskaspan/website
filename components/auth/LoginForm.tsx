@@ -30,7 +30,7 @@ export function LoginForm() {
       } else {
         setError(result.message);
       }
-    } catch (err) {
+    } catch {
       setError("An error occurred during login");
     } finally {
       setIsLoading(false);

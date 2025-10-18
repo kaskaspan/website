@@ -40,7 +40,7 @@ export default function Home() {
   const { isOnline } = useNetworkStatus();
 
   useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
+    const handleMouseMove = (e: globalThis.MouseEvent) => {
       setMousePosition({ x: e.clientX, y: e.clientY });
     };
 
