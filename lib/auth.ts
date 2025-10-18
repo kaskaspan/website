@@ -50,7 +50,7 @@ export function login(
         const user: User = {
           id: generateSessionToken(),
           username: DEFAULT_CREDENTIALS.username,
-          email: DEFAULT_CREDENTIALS.email,
+          email: `${DEFAULT_CREDENTIALS.username}@example.com`,
           loginTime: Date.now(),
         };
 
