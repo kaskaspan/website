@@ -5,7 +5,7 @@ import { SimpleAnalytics } from "@/components/analytics/SimpleAnalytics";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { LogoutButton } from "@/components/auth/LogoutButton";
 
-export default function About() {
+export default function Access() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
@@ -28,7 +28,7 @@ export default function About() {
         </div>
 
         {/* Analytics tracking */}
-        <SimpleAnalytics page="/about" />
+        <SimpleAnalytics page="/access" />
         {/* Animated Background */}
         <div className="absolute inset-0 bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
           {/* Floating orbs */}
@@ -81,52 +81,84 @@ export default function About() {
 
         {/* Content */}
         <div className="relative z-10 grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-          <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start max-w-2xl">
-            <div className="text-center sm:text-left">
+          <main className="flex flex-col gap-[32px] row-start-2 items-center max-w-4xl">
+            <div className="text-center">
               <h1 className="text-6xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent mb-4">
-                About Me
+                How to Access
               </h1>
-              <div className="w-24 h-1 bg-gradient-to-r from-purple-500 to-blue-500 mx-auto sm:mx-0 mb-8" />
+              <div className="w-24 h-1 bg-gradient-to-r from-purple-500 to-blue-500 mx-auto mb-8" />
             </div>
 
             <div className="text-lg space-y-6 text-white/90 backdrop-blur-sm bg-white/10 rounded-2xl p-8 border border-white/20">
-              <p className="text-xl font-semibold text-white">I am Kasper.</p>
-              <p className="leading-relaxed">
-                I am building my world, exploring the infinite possibilities of
-                technology and creativity. Every day brings new challenges and
-                opportunities to create something meaningful.
-              </p>
+              <h2 className="text-2xl font-semibold text-white mb-4">
+                🌐 Website Access Information
+              </h2>
+
+              <div className="space-y-4">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
+                  <span className="text-purple-400 font-semibold">
+                    Website URL:
+                  </span>
+                  <code className="bg-black/30 px-3 py-1 rounded text-blue-400 font-mono">
+                    https://kasper.build
+                  </code>
+                </div>
+
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
+                  <span className="text-purple-400 font-semibold">
+                    Alternative URL:
+                  </span>
+                  <code className="bg-black/30 px-3 py-1 rounded text-blue-400 font-mono">
+                    https://www.kasper.build
+                  </code>
+                </div>
+              </div>
+
+              <div className="mt-6 space-y-3">
+                <h3 className="text-xl font-semibold text-white">
+                  📱 How to Access:
+                </h3>
+                <ol className="list-decimal list-inside space-y-2 text-white/80">
+                  <li>Open your web browser (Chrome, Firefox, Safari, etc.)</li>
+                  <li>
+                    Type{" "}
+                    <code className="bg-black/30 px-2 py-1 rounded text-blue-400 font-mono">
+                      kasper.build
+                    </code>{" "}
+                    in the address bar
+                  </li>
+                  <li>Press Enter or click Go</li>
+                  <li>Bookmark the page for easy future access</li>
+                </ol>
+              </div>
+
+              <div className="mt-6 space-y-3">
+                <h3 className="text-xl font-semibold text-white">💡 Tips:</h3>
+                <ul className="list-disc list-inside space-y-2 text-white/80">
+                  <li>
+                    You can access this website from any device (computer,
+                    phone, tablet)
+                  </li>
+                  <li>The website is mobile-friendly and responsive</li>
+                  <li>Make sure you have an internet connection</li>
+                  <li>If the site doesn't load, try refreshing the page</li>
+                </ul>
+              </div>
             </div>
 
-            <div className="space-y-4 text-white/80">
-              <p className="flex items-center gap-2">
-                <span className="text-purple-400">📧</span>
-                <span>contact me: </span>
-                <a
-                  href="mailto:kasperr.pan@gmail.com"
-                  className="text-blue-400 hover:text-blue-300 transition-colors"
-                >
-                  kasperr.pan@gmail.com
-                </a>
-              </p>
-              <p className="flex items-center gap-2">
-                <span className="text-purple-400">🌐</span>
-                <span>here is my website: </span>
-                <Link
-                  href="/"
-                  className="text-blue-400 hover:text-blue-300 transition-colors"
-                >
-                  https://kasper.build
-                </Link>
-              </p>
-            </div>
-
-            <div className="flex gap-4">
+            <div className="flex gap-4 flex-wrap justify-center">
               <Link
                 href="/"
                 className="group relative px-8 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-full hover:from-purple-700 hover:to-blue-700 transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:shadow-purple-500/25"
               >
-                <span className="relative z-10">Back to Home</span>
+                <span className="relative z-10">🏠 Back to Home</span>
+                <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full blur opacity-0 group-hover:opacity-75 transition-opacity duration-300" />
+              </Link>
+              <Link
+                href="/about"
+                className="group relative px-8 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-full hover:from-purple-700 hover:to-blue-700 transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:shadow-purple-500/25"
+              >
+                <span className="relative z-10">👤 About Me</span>
                 <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full blur opacity-0 group-hover:opacity-75 transition-opacity duration-300" />
               </Link>
             </div>

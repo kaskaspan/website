@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { OfflineDetector } from "@/components/ui/offline-detector";
+import { GoogleAnalytics } from "@/components/analytics/GoogleAnalytics";
+import { AuthProvider } from "@/components/auth/AuthProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,8 +30,12 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <OfflineDetector />
-        {children}
+        <AuthProvider>
+          <OfflineDetector />
+          {/* Google Analytics - Replace with your Measurement ID */}
+          <GoogleAnalytics measurementId="G-XXXXXXXXXX" />
+          {children}
+        </AuthProvider>
       </body>
     </html>
   );
