@@ -1,4 +1,6 @@
+/* stylelint-disable-next-line at-rule-no-unknown */
 @import "tailwindcss";
+/* stylelint-disable-next-line at-rule-no-unknown */
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
@@ -114,9 +116,75 @@
 
 @layer base {
   * {
+    /* stylelint-disable-next-line at-rule-no-unknown */
     @apply border-border outline-ring/50;
   }
   body {
+    /* stylelint-disable-next-line at-rule-no-unknown */
     @apply bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+  /* 离线检测动画 */
+  @keyframes slide-down {
+    from {
+      transform: translateY(-100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  .animate-slide-down {
+    animation: slide-down 0.3s ease-out;
+  }
+
+  /* 网络状态脉冲动画 */
+  @keyframes network-pulse {
+    0%,
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.5;
+      transform: scale(0.95);
+    }
+  }
+
+  .animate-network-pulse {
+    animation: network-pulse 2s ease-in-out infinite;
+  }
+
+  /* 移动端游戏优化 */
+  .touch-manipulation {
+    touch-action: manipulation;
+  }
+
+  /* 防止移动端缩放 */
+  .game-canvas {
+    touch-action: none;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+
+  /* 移动端按钮优化 */
+  .mobile-button {
+    min-height: 44px;
+    min-width: 44px;
+    touch-action: manipulation;
+  }
+
+  /* 移动端游戏容器 */
+  .mobile-game-container {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: none;
   }
 }

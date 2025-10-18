@@ -2,6 +2,12 @@
 import { Button } from "@/components/ui/button";
 import { Globe } from "@/components/ui/globe";
 import { VideoText } from "@/components/ui/video-text";
+import { PageLoading } from "@/components/ui/loading";
+import {
+  OfflineDetector,
+  OfflinePage,
+  useNetworkStatus,
+} from "@/components/ui/offline-detector";
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -29,6 +35,8 @@ export function VideoTextDemo() {
 export default function Home() {
   const router = useRouter();
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [isPageLoading, setIsPageLoading] = useState(true);
+  const { isOnline } = useNetworkStatus();
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -41,12 +49,33 @@ export default function Home() {
     }
   }, []);
 
+  // 页面加载完成后显示内容
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsPageLoading(false);
+    }, 2000); // 2秒加载时间
+
+    return () => clearTimeout(timer);
+  }, []);
+
   const handleClick = () => {
     router.push("/about");
   };
 
+  // 显示离线页面
+  if (!isOnline) {
+    return <OfflinePage />;
+  }
+
+  // 显示加载页面
+  if (isPageLoading) {
+    return <PageLoading />;
+  }
+
   return (
     <div className="font-sans relative min-h-screen overflow-hidden">
+      {/* 网络状态检测器 */}
+      <OfflineDetector />
       {/* Animated Background */}
       <div className="absolute inset-0 bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
         {/* Floating orbs */}
@@ -130,8 +159,7 @@ export default function Home() {
             </Button>
             <Button
               asChild
-              variant="outline"
-              className="border-white/30 text-white hover:bg-white/10"
+              className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white border-0"
             >
               <Link href="/blog">blog</Link>
             </Button>
