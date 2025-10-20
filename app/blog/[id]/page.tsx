@@ -86,8 +86,13 @@ The grave as little as my beer.” `,
   },
 ];
 
-export default function BlogPost({ params }: { params: { id: string } }) {
-  const post = blogPosts.find((p) => p.id === parseInt(params.id));
+export default async function BlogPost({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+  const post = blogPosts.find((p) => p.id === parseInt(id));
 
   if (!post) {
     notFound();

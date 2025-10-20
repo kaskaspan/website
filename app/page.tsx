@@ -14,16 +14,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-export function SmoothCursorDemo() {
-  return (
-    <>
-      <span className="hidden md:block">Move your mouse around</span>
-      <span className="block md:hidden">Tap anywhere to see the cursor</span>
-    </>
-  );
-}
-
-export function VideoTextDemo() {
+function VideoTextDemo() {
   return (
     <div className="relative h-[200px] w-full max-w-4xl overflow-hidden">
       <VideoText src="https://cdn.magicui.design/ocean-small.webm">
