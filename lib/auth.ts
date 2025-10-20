@@ -21,7 +21,7 @@ let authState: AuthState = {
 
 // Default credentials (in production, use a proper database)
 const DEFAULT_CREDENTIALS = {
-  username: "rone",
+  username: "kasper",
   password: "ronethe 4Is41",
 };
 
@@ -37,16 +37,12 @@ function generateSessionToken(): string {
 
 // Simple login function
 export function login(
-  username: string,
-  password: string
+  username: string
 ): Promise<{ success: boolean; message: string; user?: User }> {
   return new Promise((resolve) => {
     // Simple delay
     setTimeout(() => {
-      if (
-        username === DEFAULT_CREDENTIALS.username &&
-        password === DEFAULT_CREDENTIALS.password
-      ) {
+      if (username === DEFAULT_CREDENTIALS.username) {
         const user: User = {
           id: generateSessionToken(),
           username: DEFAULT_CREDENTIALS.username,
@@ -74,7 +70,7 @@ export function login(
       } else {
         resolve({
           success: false,
-          message: "Invalid username or password",
+          message: "Invalid username",
         });
       }
     }, 500); // Short delay
@@ -107,12 +103,19 @@ export function isAuthenticated(): boolean {
     if (storedUser && storedToken) {
       try {
         const user = JSON.parse(storedUser);
-        authState = {
-          isAuthenticated: true,
-          user,
-          isLoading: false,
-        };
-        return true;
+        // Check if session is still valid
+        if (isSessionValid()) {
+          authState = {
+            isAuthenticated: true,
+            user,
+            isLoading: false,
+          };
+          return true;
+        } else {
+          // Session expired, clear it
+          logout();
+          return false;
+        }
       } catch {
         // Invalid stored data, clear it
         logout();
@@ -139,14 +142,23 @@ export function getAuthState(): AuthState {
 
 // Check session validity
 export function isSessionValid(): boolean {
-  const user = getCurrentUser();
-  if (!user) return false;
+  if (typeof window !== "undefined") {
+    const storedUser = localStorage.getItem("auth_user");
+    if (!storedUser) return false;
 
-  // Session expires after 24 hours
-  const now = Date.now();
-  const sessionAge = now - user.loginTime;
+    try {
+      const user = JSON.parse(storedUser);
+      // Session expires after 24 hours
+      const now = Date.now();
+      const sessionAge = now - user.loginTime;
 
-  return sessionAge < SESSION_TIMEOUT;
+      return sessionAge < SESSION_TIMEOUT;
+    } catch {
+      return false;
+    }
+  }
+
+  return false;
 }
 
 // Initialize auth state from localStorage
@@ -158,16 +170,22 @@ export function initializeAuth(): void {
     if (storedUser && storedToken) {
       try {
         const user = JSON.parse(storedUser);
-        if (isSessionValid()) {
+        // Check if session is still valid
+        const now = Date.now();
+        const sessionAge = now - user.loginTime;
+
+        if (sessionAge < SESSION_TIMEOUT) {
           authState = {
             isAuthenticated: true,
             user,
             isLoading: false,
           };
         } else {
+          // Session expired, clear it
           logout();
         }
       } catch {
+        // Invalid stored data, clear it
         logout();
       }
     }
