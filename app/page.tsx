@@ -24,6 +24,10 @@ function VideoTextDemo() {
   );
 }
 
+function ProfilePhoto() {
+  return null;
+}
+
 export default function Home() {
   const router = useRouter();
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
@@ -138,19 +142,26 @@ export default function Home() {
 
       {/* Hidden Analytics Button - Bottom Right */}
       <div className="fixed bottom-4 right-4 z-20">
-        <Button
-          asChild
-          size="sm"
-          className="h-8 px-2 text-xs bg-transparent hover:bg-transparent text-transparent border-0 rounded-full opacity-0 hover:opacity-0"
-        >
-          <Link href="/analytics">📊</Link>
-        </Button>
+        <div className="w-8 h-8 bg-transparent hover:bg-transparent cursor-pointer">
+          <Link
+            href="/analytics"
+            className="block w-full h-full bg-transparent hover:bg-transparent"
+            style={{
+              background: "transparent",
+              border: "none",
+              outline: "none",
+            }}
+          >
+            <span className="sr-only">Analytics</span>
+          </Link>
+        </div>
       </div>
 
       {/* Content */}
       <div className="relative z-10 grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
         <Globe className="absolute inset-0 mx-auto opacity-30" />
         <main className="flex flex-col gap-[32px] row-start-2 items-center relative z-10">
+          <ProfilePhoto />
           <VideoTextDemo />
           <p className="text-lg text-white/90 backdrop-blur-sm bg-white/10 rounded-2xl px-6 py-3 border border-white/20">
             I&apos;m building my world.
@@ -167,6 +178,12 @@ export default function Home() {
               className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white border-0"
             >
               <Link href="/blog">blog</Link>
+            </Button>
+            <Button
+              asChild
+              className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white border-0"
+            >
+              <Link href="/game">🎮 Play Game</Link>
             </Button>
             <Button
               asChild

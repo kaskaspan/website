@@ -81,6 +81,34 @@ export default function About() {
             <div className="w-24 h-1 bg-gradient-to-r from-purple-500 to-blue-500 mx-auto sm:mx-0 mb-8" />
           </div>
 
+          {/* Profile Photo */}
+          <div className="flex justify-center sm:justify-start mb-6">
+            <div className="relative">
+              <div className="w-40 h-40 rounded-full overflow-hidden border-4 border-white/20 shadow-2xl">
+                <img
+                  src="/images/profile.jpg"
+                  alt="Kasper Pan"
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    // 如果照片不存在，显示默认头像
+                    e.currentTarget.style.display = "none";
+                    const nextElement = e.currentTarget
+                      .nextElementSibling as HTMLElement;
+                    if (nextElement) {
+                      nextElement.style.display = "flex";
+                    }
+                  }}
+                />
+                <div className="w-full h-full bg-gradient-to-br from-purple-500 to-blue-500 items-center justify-center text-white text-5xl font-bold hidden">
+                  KP
+                </div>
+              </div>
+              <div className="absolute -bottom-2 -right-2 w-10 h-10 bg-green-500 rounded-full border-4 border-white/20 flex items-center justify-center">
+                <div className="w-4 h-4 bg-white rounded-full"></div>
+              </div>
+            </div>
+          </div>
+
           <div className="text-lg space-y-6 text-white/90 backdrop-blur-sm bg-white/10 rounded-2xl p-8 border border-white/20">
             <p className="text-xl font-semibold text-white">I am Kasper.</p>
             <p className="leading-relaxed">

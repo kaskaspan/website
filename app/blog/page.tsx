@@ -139,12 +139,17 @@ export default function Blog() {
         {/* Floating particles */}
         <div className="absolute inset-0 pointer-events-none">
           {[...Array(20)].map((_, i) => {
-            // Use a deterministic seed based on index to avoid hydration mismatch
+            // Use a more precise deterministic seed to avoid hydration mismatch
             const seed = i * 0.1;
-            const left = (Math.sin(seed) * 0.5 + 0.5) * 100;
-            const top = (Math.cos(seed) * 0.5 + 0.5) * 100;
-            const animationDelay = (Math.sin(seed * 2) * 0.5 + 0.5) * 3;
-            const animationDuration = 2 + (Math.cos(seed * 3) * 0.5 + 0.5) * 3;
+            const left =
+              Math.round((Math.sin(seed) * 0.5 + 0.5) * 100 * 100) / 100;
+            const top =
+              Math.round((Math.cos(seed) * 0.5 + 0.5) * 100 * 100) / 100;
+            const animationDelay =
+              Math.round((Math.sin(seed * 2) * 0.5 + 0.5) * 3 * 1000) / 1000;
+            const animationDuration =
+              Math.round((2 + (Math.cos(seed * 3) * 0.5 + 0.5) * 3) * 1000) /
+              1000;
 
             return (
               <div

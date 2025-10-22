@@ -23,8 +23,8 @@ export function LoginForm() {
       const result = await login(username);
 
       if (result.success) {
-        // Redirect to home page after successful login
-        router.push("/");
+        // Redirect to leaderboard page after successful login
+        router.push("/leaderboard");
         router.refresh();
       } else {
         setError(result.message);

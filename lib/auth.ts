@@ -42,11 +42,12 @@ export function login(
   return new Promise((resolve) => {
     // Simple delay
     setTimeout(() => {
-      if (username === DEFAULT_CREDENTIALS.username) {
+      // Allow any non-empty username to login
+      if (username && username.trim().length > 0) {
         const user: User = {
           id: generateSessionToken(),
-          username: DEFAULT_CREDENTIALS.username,
-          email: `${DEFAULT_CREDENTIALS.username}@example.com`,
+          username: username.trim(),
+          email: `${username.trim()}@example.com`,
           loginTime: Date.now(),
         };
 
@@ -60,6 +61,7 @@ export function login(
         if (typeof window !== "undefined") {
           localStorage.setItem("auth_user", JSON.stringify(user));
           localStorage.setItem("auth_token", user.id);
+          localStorage.setItem("isLoggedIn", "true");
         }
 
         resolve({
@@ -70,7 +72,7 @@ export function login(
       } else {
         resolve({
           success: false,
-          message: "Invalid username",
+          message: "Please enter a username",
         });
       }
     }, 500); // Short delay
@@ -88,6 +90,7 @@ export function logout(): void {
   if (typeof window !== "undefined") {
     localStorage.removeItem("auth_user");
     localStorage.removeItem("auth_token");
+    localStorage.removeItem("isLoggedIn");
     // Clear cookie
     document.cookie =
       "auth_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
