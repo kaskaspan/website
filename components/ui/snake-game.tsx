@@ -174,7 +174,7 @@ export function SnakeGame() {
           );
 
           // Apply special effects based on food type
-          let newSpecialEffects = { ...prevState.specialEffects };
+          const newSpecialEffects = { ...prevState.specialEffects };
           if (eatenFood.type === "speed") {
             newSpecialEffects.speedBoost = true;
             setTimeout(() => {
@@ -493,7 +493,7 @@ export function SnakeGame() {
           <p>⚡ Blue food: Speed boost for 5s</p>
           <p>🐌 Purple food: Slow motion for 3s</p>
           <p>🛡️ Orange food: Invincible for 10s</p>
-          <p>💀 Don't hit the walls or yourself!</p>
+          <p>💀 Don&apos;t hit the walls or yourself!</p>
           <p>⏸️ Press SPACE to pause/resume</p>
         </div>
       </Card>

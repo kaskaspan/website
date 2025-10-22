@@ -20,10 +20,10 @@ let authState: AuthState = {
 };
 
 // Default credentials (in production, use a proper database)
-const DEFAULT_CREDENTIALS = {
-  username: "kasper",
-  password: "ronethe 4Is41",
-};
+// const DEFAULT_CREDENTIALS = {
+//   username: "kasper",
+//   password: "ronethe 4Is41",
+// };
 
 // Simple session timeout (24 hours)
 const SESSION_TIMEOUT = 24 * 60 * 60 * 1000; // 24 hours
