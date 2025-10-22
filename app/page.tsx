@@ -136,12 +136,12 @@ export default function Home() {
         ))}
       </div>
 
-      {/* Small Analytics Button - Bottom Right */}
+      {/* Hidden Analytics Button - Bottom Right */}
       <div className="fixed bottom-4 right-4 z-20">
         <Button
           asChild
           size="sm"
-          className="h-8 px-2 text-xs bg-green-600 hover:bg-green-700 text-white border-0 rounded-full"
+          className="h-8 px-2 text-xs bg-transparent hover:bg-transparent text-transparent border-0 rounded-full opacity-0 hover:opacity-0"
         >
           <Link href="/analytics">📊</Link>
         </Button>
