@@ -84,6 +84,25 @@ The grave as little as my beer.” `,
       Nothing special so far, and I'm excited to continue improving it!
     `,
   },
+  {
+    id: 4,
+    title: "Minecraft",
+    date: "October 22, 2025",
+    excerpt: "Another interesting blog post about Minecraft.",
+    image:
+      "https://www.minecraft.net/content/dam/games/minecraft/key-art/Games_Subnav_Minecraft-300x465.jpg",
+    imageAlt: "Minecraft modern houses and buildings showcase",
+    content: `
+      Minecraft is a game that I love to play. I'm constantly learning and growing, and I love sharing that journey with others.
+      
+      In this post, I want to talk about:
+      - The importance of Minecraft
+      - How Minecraft shapes our daily lives
+      - The creative process behind building Minecraft experiences
+      
+      I hope you find this content valuable and inspiring!
+    `,
+  },
 ];
 
 export default async function BlogPost({

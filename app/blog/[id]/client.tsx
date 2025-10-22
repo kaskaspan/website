@@ -9,6 +9,8 @@ interface BlogPost {
   excerpt: string;
   h1?: string;
   content: string;
+  image?: string;
+  imageAlt?: string;
 }
 
 interface BlogPostClientProps {
@@ -83,18 +85,27 @@ export default function BlogPostClient({ post }: BlogPostClientProps) {
 
       {/* Floating particles */}
       <div className="absolute inset-0 pointer-events-none">
-        {[...Array(20)].map((_, i) => (
-          <div
-            key={i}
-            className="absolute w-1 h-1 bg-white/30 rounded-full animate-pulse"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 3}s`,
-              animationDuration: `${2 + Math.random() * 3}s`,
-            }}
-          />
-        ))}
+        {[...Array(20)].map((_, i) => {
+          // Use a deterministic seed based on index to avoid hydration mismatch
+          const seed = i * 0.1;
+          const left = (Math.sin(seed) * 0.5 + 0.5) * 100;
+          const top = (Math.cos(seed) * 0.5 + 0.5) * 100;
+          const animationDelay = (Math.sin(seed * 2) * 0.5 + 0.5) * 3;
+          const animationDuration = 2 + (Math.cos(seed * 3) * 0.5 + 0.5) * 3;
+
+          return (
+            <div
+              key={i}
+              className="absolute w-1 h-1 bg-white/30 rounded-full animate-pulse"
+              style={{
+                left: `${left}%`,
+                top: `${top}%`,
+                animationDelay: `${animationDelay}s`,
+                animationDuration: `${animationDuration}s`,
+              }}
+            />
+          );
+        })}
       </div>
 
       {/* Content */}
@@ -105,6 +116,17 @@ export default function BlogPostClient({ post }: BlogPostClientProps) {
               {post.title}
             </h1>
             <p className="text-white/70 text-sm mb-8">{post.date}</p>
+
+            {post.image && (
+              <div className="mb-8">
+                <img
+                  src={post.image}
+                  alt={post.imageAlt || post.title}
+                  className="w-full h-auto rounded-lg shadow-2xl border border-white/20"
+                />
+              </div>
+            )}
+
             <div className="prose prose-lg max-w-none">
               <p className="text-white/90 whitespace-pre-line leading-relaxed">
                 {post.content}
