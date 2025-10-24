@@ -2,6 +2,13 @@
 
 import Link from "next/link";
 import { SnakeGame } from "@/components/ui/snake-game";
+import { TetrisGame } from "@/components/ui/tetris-game";
+import { PongGame } from "@/components/ui/pong-game";
+import { BreakoutGame } from "@/components/ui/breakout-game";
+import { MinesweeperGame } from "@/components/ui/minesweeper-game";
+import { MemoryGame } from "@/components/ui/memory-game";
+import { Game2048 } from "@/components/ui/2048-game";
+import { SpaceInvadersGame } from "@/components/ui/space-invaders-game";
 import { GameSidebar } from "@/components/ui/game-sidebar";
 import { useEffect, useState } from "react";
 
@@ -77,10 +84,14 @@ export default function GamePage() {
         {[...Array(20)].map((_, i) => {
           // Use a deterministic seed based on index to avoid hydration mismatch
           const seed = i * 0.1;
-          const left = (Math.sin(seed) * 0.5 + 0.5) * 100;
-          const top = (Math.cos(seed) * 0.5 + 0.5) * 100;
-          const animationDelay = (Math.sin(seed * 2) * 0.5 + 0.5) * 3;
-          const animationDuration = 2 + (Math.cos(seed * 3) * 0.5 + 0.5) * 3;
+          const left =
+            Math.round((Math.sin(seed) * 0.5 + 0.5) * 100 * 100) / 100;
+          const top =
+            Math.round((Math.cos(seed) * 0.5 + 0.5) * 100 * 100) / 100;
+          const animationDelay =
+            Math.round((Math.sin(seed * 2) * 0.5 + 0.5) * 3 * 100) / 100;
+          const animationDuration =
+            Math.round((2 + (Math.cos(seed * 3) * 0.5 + 0.5) * 3) * 100) / 100;
 
           return (
             <div
@@ -123,38 +134,13 @@ export default function GamePage() {
             {/* Game Content */}
             <div className="min-h-[600px]">
               {currentGame === "snake" && <SnakeGame />}
-              {currentGame === "tetris" && (
-                <div className="flex items-center justify-center h-96 bg-white/10 rounded-lg border border-white/20">
-                  <div className="text-center text-white">
-                    <h3 className="text-2xl font-bold mb-4">🧩 Tetris</h3>
-                    <p className="text-white/70">Coming Soon!</p>
-                  </div>
-                </div>
-              )}
-              {currentGame === "pong" && (
-                <div className="flex items-center justify-center h-96 bg-white/10 rounded-lg border border-white/20">
-                  <div className="text-center text-white">
-                    <h3 className="text-2xl font-bold mb-4">🏓 Pong</h3>
-                    <p className="text-white/70">Coming Soon!</p>
-                  </div>
-                </div>
-              )}
-              {currentGame === "breakout" && (
-                <div className="flex items-center justify-center h-96 bg-white/10 rounded-lg border border-white/20">
-                  <div className="text-center text-white">
-                    <h3 className="text-2xl font-bold mb-4">💥 Breakout</h3>
-                    <p className="text-white/70">Coming Soon!</p>
-                  </div>
-                </div>
-              )}
-              {currentGame === "minesweeper" && (
-                <div className="flex items-center justify-center h-96 bg-white/10 rounded-lg border border-white/20">
-                  <div className="text-center text-white">
-                    <h3 className="text-2xl font-bold mb-4">💣 Minesweeper</h3>
-                    <p className="text-white/70">Coming Soon!</p>
-                  </div>
-                </div>
-              )}
+              {currentGame === "tetris" && <TetrisGame />}
+              {currentGame === "pong" && <PongGame />}
+              {currentGame === "breakout" && <BreakoutGame />}
+              {currentGame === "minesweeper" && <MinesweeperGame />}
+              {currentGame === "memory" && <MemoryGame />}
+              {currentGame === "2048" && <Game2048 />}
+              {currentGame === "space-invaders" && <SpaceInvadersGame />}
             </div>
 
             <div className="mt-12 pt-8 border-t border-white/20 text-center">

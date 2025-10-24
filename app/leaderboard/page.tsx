@@ -5,6 +5,13 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import {
+  getUserScores,
+  getLeaderboardData,
+  getUserStats,
+  saveUserScore,
+  type UserScore,
+} from "@/lib/user-storage";
 
 interface LeaderboardEntry {
   rank: number;
@@ -12,109 +19,112 @@ interface LeaderboardEntry {
   score: number;
   game: string;
   date: string;
+  timestamp?: number;
 }
 
 export default function LeaderboardPage() {
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedDate, setSelectedDate] = useState<string>("");
+  const [sortOrder, setSortOrder] = useState<"desc" | "asc">("desc");
+  const [showAddScore, setShowAddScore] = useState(false);
+  const [newScore, setNewScore] = useState({
+    username: "",
+    score: 0,
+    game: "Snake",
+  });
   const router = useRouter();
 
-  // 模拟实时更新排行榜
-  const updateLeaderboard = () => {
-    const getLeaderboardData = (): LeaderboardEntry[] => {
-      const rawData = [
+  // 初始化示例数据（如果没有任何数据）
+  const initializeSampleData = () => {
+    const existingScores = getUserScores();
+    if (existingScores.length === 0) {
+      const sampleScores = [
         {
-          player: "GameMaster",
+          username: "GameMaster",
           score: 15420,
           game: "Snake",
           date: "2024-01-15",
         },
         {
-          player: "SnakeKing",
+          username: "SnakeKing",
           score: 12850,
           game: "Snake",
           date: "2024-01-14",
         },
         {
-          player: "BlockBuster",
+          username: "BlockBuster",
           score: 11200,
           game: "Tetris",
           date: "2024-01-13",
         },
-        { player: "PongMaster", score: 9800, game: "Pong", date: "2024-01-12" },
         {
-          player: "BreakoutPro",
+          username: "PongMaster",
+          score: 9800,
+          game: "Pong",
+          date: "2024-01-12",
+        },
+        {
+          username: "BreakoutPro",
           score: 8750,
           game: "Breakout",
           date: "2024-01-11",
         },
         {
-          player: "MineHunter",
+          username: "MineHunter",
           score: 7200,
           game: "Minesweeper",
           date: "2024-01-10",
         },
-        { player: "GameLover", score: 6800, game: "Snake", date: "2024-01-09" },
         {
-          player: "ScoreChaser",
+          username: "GameLover",
+          score: 6800,
+          game: "Snake",
+          date: "2024-01-09",
+        },
+        {
+          username: "ScoreChaser",
           score: 6200,
           game: "Tetris",
           date: "2024-01-08",
         },
-        { player: "ArcadeFan", score: 5800, game: "Pong", date: "2024-01-07" },
         {
-          player: "RetroGamer",
+          username: "ArcadeFan",
+          score: 5800,
+          game: "Pong",
+          date: "2024-01-07",
+        },
+        {
+          username: "RetroGamer",
           score: 5400,
           game: "Breakout",
           date: "2024-01-06",
         },
-        // 动态添加新玩家高分（模拟实时更新）
-        {
-          player: "NewChampion",
-          score: 18500 + Math.floor(Math.random() * 1000),
-          game: "Snake",
-          date: "2024-01-16",
-        },
-        {
-          player: "RisingStar",
-          score: 14200 + Math.floor(Math.random() * 500),
-          game: "Tetris",
-          date: "2024-01-16",
-        },
-        {
-          player: "ProGamer",
-          score: 13500 + Math.floor(Math.random() * 300),
-          game: "Snake",
-          date: "2024-01-16",
-        },
-        {
-          player: "SpeedRunner",
-          score: 16800 + Math.floor(Math.random() * 200),
-          game: "Snake",
-          date: "2024-01-16",
-        },
-        {
-          player: "MasterPlayer",
-          score: 15200 + Math.floor(Math.random() * 400),
-          game: "Tetris",
-          date: "2024-01-16",
-        },
       ];
 
-      // 按分数降序排序
-      const sortedData = rawData.sort((a, b) => b.score - a.score);
+      sampleScores.forEach((score) => {
+        saveUserScore(score);
+      });
+    }
+  };
 
-      // 分配排名
-      return sortedData.map((entry, index) => ({
+  // 获取真实用户排行榜数据
+  const updateLeaderboard = () => {
+    const userScores = getLeaderboardData();
+
+    // 转换为排行榜格式并分配排名
+    const leaderboardData: LeaderboardEntry[] = userScores.map(
+      (score, index) => ({
         rank: index + 1,
-        player: entry.player,
-        score: entry.score,
-        game: entry.game,
-        date: entry.date,
-      }));
-    };
+        player: score.username,
+        score: score.score,
+        game: score.game,
+        date: score.date,
+        timestamp: score.timestamp,
+      })
+    );
 
-    return getLeaderboardData();
+    return leaderboardData;
   };
 
   useEffect(() => {
@@ -125,22 +135,94 @@ export default function LeaderboardPage() {
       return;
     }
 
-    const mockLeaderboard = updateLeaderboard();
+    // 初始化示例数据（如果需要）
+    initializeSampleData();
 
-    // 模拟API调用延迟
+    const realLeaderboard = updateLeaderboard();
+
+    // 加载真实数据
     setTimeout(() => {
-      setLeaderboard(mockLeaderboard);
+      setLeaderboard(realLeaderboard);
       setIsLoading(false);
-    }, 1000);
+    }, 500);
 
-    // 设置自动刷新排行榜（极快更新）
+    // 设置定期刷新（每30秒检查一次新数据）
     const refreshInterval = setInterval(() => {
       const updatedLeaderboard = updateLeaderboard();
       setLeaderboard(updatedLeaderboard);
-    }, 0.0000000001); // 极快刷新
+    }, 30000); // 30秒刷新一次
 
-    return () => clearInterval(refreshInterval);
+    // 监听自动记录事件
+    const handleLeaderboardUpdate = () => {
+      const updatedLeaderboard = updateLeaderboard();
+      setLeaderboard(updatedLeaderboard);
+    };
+
+    window.addEventListener("leaderboardUpdate", handleLeaderboardUpdate);
+
+    return () => {
+      clearInterval(refreshInterval);
+      window.removeEventListener("leaderboardUpdate", handleLeaderboardUpdate);
+    };
   }, [router]);
+
+  // 处理日期选择
+  const handleDateChange = (date: string) => {
+    setSelectedDate(date);
+  };
+
+  // 处理排序切换
+  const handleSortToggle = () => {
+    setSortOrder(sortOrder === "desc" ? "asc" : "desc");
+  };
+
+  // 获取过滤和排序后的数据
+  const getFilteredAndSortedData = () => {
+    let filteredData = leaderboard;
+
+    // 按日期过滤
+    if (selectedDate) {
+      filteredData = leaderboard.filter((entry) => entry.date === selectedDate);
+    }
+
+    // 按分数排序
+    const sortedData = filteredData.sort((a, b) => {
+      return sortOrder === "desc" ? b.score - a.score : a.score - b.score;
+    });
+
+    // 重新分配排名
+    return sortedData.map((entry, index) => ({
+      ...entry,
+      rank: index + 1,
+    }));
+  };
+
+  // 获取所有可用日期
+  const getAvailableDates = () => {
+    const dates = [...new Set(leaderboard.map((entry) => entry.date))];
+    return dates.sort();
+  };
+
+  // 处理添加新分数
+  const handleAddScore = () => {
+    if (newScore.username && newScore.score > 0) {
+      const today = new Date().toISOString().split("T")[0];
+      saveUserScore({
+        username: newScore.username,
+        score: newScore.score,
+        game: newScore.game,
+        date: today,
+      });
+
+      // 刷新排行榜
+      const updatedLeaderboard = updateLeaderboard();
+      setLeaderboard(updatedLeaderboard);
+
+      // 重置表单
+      setNewScore({ username: "", score: 0, game: "Snake" });
+      setShowAddScore(false);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -173,6 +255,137 @@ export default function LeaderboardPage() {
             </p>
           </div>
 
+          {/* 控制面板 */}
+          <Card className="bg-gradient-to-br from-purple-900/50 via-blue-900/50 to-indigo-900/50 border-white/20 backdrop-blur-sm mb-6">
+            <div className="p-6">
+              <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
+                {/* 日期选择器 */}
+                <div className="flex items-center gap-4">
+                  <label className="text-white font-medium">选择日期:</label>
+                  <select
+                    value={selectedDate}
+                    onChange={(e) => handleDateChange(e.target.value)}
+                    className="bg-white/10 border border-white/20 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  >
+                    <option value="">所有日期</option>
+                    {getAvailableDates().map((date) => (
+                      <option key={date} value={date} className="bg-gray-800">
+                        {date}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* 排序控制 */}
+                <div className="flex items-center gap-4">
+                  <span className="text-white font-medium">排序:</span>
+                  <Button
+                    onClick={handleSortToggle}
+                    className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white border-0"
+                  >
+                    {sortOrder === "desc" ? "🔽 从大到小" : "🔼 从小到大"}
+                  </Button>
+                </div>
+
+                {/* 添加分数按钮 */}
+                <div className="flex items-center gap-4">
+                  <Button
+                    onClick={() => setShowAddScore(!showAddScore)}
+                    className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white border-0"
+                  >
+                    {showAddScore ? "❌ 取消" : "➕ 添加分数"}
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </Card>
+
+          {/* 添加分数表单 */}
+          {showAddScore && (
+            <Card className="bg-gradient-to-br from-green-900/50 via-emerald-900/50 to-teal-900/50 border-white/20 backdrop-blur-sm mb-6">
+              <div className="p-6">
+                <h3 className="text-xl font-bold text-white mb-4">
+                  ➕ 添加新分数
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                  <div>
+                    <label className="block text-white text-sm font-medium mb-2">
+                      用户名
+                    </label>
+                    <input
+                      type="text"
+                      value={newScore.username}
+                      onChange={(e) =>
+                        setNewScore({ ...newScore, username: e.target.value })
+                      }
+                      className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                      placeholder="输入用户名"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-white text-sm font-medium mb-2">
+                      分数
+                    </label>
+                    <input
+                      type="number"
+                      value={newScore.score}
+                      onChange={(e) =>
+                        setNewScore({
+                          ...newScore,
+                          score: parseInt(e.target.value) || 0,
+                        })
+                      }
+                      className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                      placeholder="输入分数"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-white text-sm font-medium mb-2">
+                      游戏
+                    </label>
+                    <select
+                      value={newScore.game}
+                      onChange={(e) =>
+                        setNewScore({ ...newScore, game: e.target.value })
+                      }
+                      className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                    >
+                      <option value="Snake">Snake</option>
+                      <option value="Tetris">Tetris</option>
+                      <option value="Pong">Pong</option>
+                      <option value="Breakout">Breakout</option>
+                      <option value="Minesweeper">Minesweeper</option>
+                    </select>
+                  </div>
+                  <div className="flex items-end">
+                    <Button
+                      onClick={handleAddScore}
+                      className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white border-0"
+                    >
+                      添加分数
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </Card>
+          )}
+
+          {/* 显示当前过滤状态 */}
+          {selectedDate && (
+            <div className="mb-4 text-center">
+              <p className="text-white/70">
+                显示日期:{" "}
+                <span className="text-purple-400 font-bold">
+                  {selectedDate}
+                </span>{" "}
+                的排行榜
+                <span className="ml-2">
+                  ({getFilteredAndSortedData().length} 条记录)
+                </span>
+              </p>
+            </div>
+          )}
+
           {/* Leaderboard */}
           <Card className="bg-gradient-to-br from-purple-900/50 via-blue-900/50 to-indigo-900/50 border-white/20 backdrop-blur-sm">
             <div className="p-6">
@@ -188,7 +401,7 @@ export default function LeaderboardPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {leaderboard.map((entry) => (
+                    {getFilteredAndSortedData().map((entry) => (
                       <tr
                         key={entry.rank}
                         className="border-b border-white/10 hover:bg-white/5 transition-colors"

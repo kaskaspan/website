@@ -20,6 +20,13 @@ const GAMES = [
     name: "💣 Minesweeper",
     description: "Mine finding game",
   },
+  { id: "memory", name: "🧠 Memory", description: "Card matching game" },
+  { id: "2048", name: "🔢 2048", description: "Number puzzle game" },
+  {
+    id: "space-invaders",
+    name: "🚀 Space Invaders",
+    description: "Arcade shooter game",
+  },
 ];
 
 export function GameSidebar({ currentGame, onGameSelect }: GameSidebarProps) {

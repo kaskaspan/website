@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { integrateGameWithAutoRecorder } from "@/lib/auto-recorder";
 
 interface Position {
   x: number;
@@ -70,6 +71,9 @@ export function SnakeGame() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [difficulty, setDifficulty] =
     useState<keyof typeof DIFFICULTY_LEVELS>("medium");
+
+  // 自动记录器
+  const [gameRecorder, setGameRecorder] = useState<any>(null);
 
   // Generate random food with different types
   const generateFood = useCallback((): Food => {
@@ -139,6 +143,11 @@ export function SnakeGame() {
             head.y < 0 ||
             head.y >= GRID_SIZE)
         ) {
+          // 游戏结束时自动保存分数
+          if (gameRecorder) {
+            gameRecorder.endGame(prevState.score);
+            setGameRecorder(null);
+          }
           return { ...prevState, gameOver: true };
         }
 
@@ -157,6 +166,11 @@ export function SnakeGame() {
             (segment) => segment.x === head.x && segment.y === head.y
           )
         ) {
+          // 游戏结束时自动保存分数
+          if (gameRecorder) {
+            gameRecorder.endGame(prevState.score);
+            setGameRecorder(null);
+          }
           return { ...prevState, gameOver: true };
         }
 
@@ -205,12 +219,19 @@ export function SnakeGame() {
           const updatedFoods =
             newFoods.length === 0 ? [generateFood()] : newFoods;
 
+          const newScore = prevState.score + eatenFood.points;
+
+          // 更新自动记录器中的分数
+          if (gameRecorder) {
+            gameRecorder.updateScore(newScore);
+          }
+
           return {
             ...prevState,
             snake: newSnake,
             foods: updatedFoods,
-            score: prevState.score + eatenFood.points,
-            level: Math.floor((prevState.score + eatenFood.points) / 100) + 1,
+            score: newScore,
+            level: Math.floor(newScore / 100) + 1,
             specialEffects: newSpecialEffects,
           };
         } else {
@@ -301,10 +322,20 @@ export function SnakeGame() {
       },
     });
     setIsPlaying(true);
+
+    // 开始自动记录
+    const recorder = integrateGameWithAutoRecorder("Snake", "snake-game");
+    setGameRecorder(recorder);
   };
 
   const stopGame = () => {
     setIsPlaying(false);
+
+    // 结束自动记录
+    if (gameRecorder) {
+      gameRecorder.endGame(gameState.score);
+      setGameRecorder(null);
+    }
   };
 
   const resetGame = () => {
