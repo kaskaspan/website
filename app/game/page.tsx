@@ -9,6 +9,7 @@ import { MinesweeperGame } from "@/components/ui/minesweeper-game";
 import { MemoryGame } from "@/components/ui/memory-game";
 import { Game2048 } from "@/components/ui/2048-game";
 import { SpaceInvadersGame } from "@/components/ui/space-invaders-game";
+import { ChessGame } from "@/components/ui/chess-game";
 import { GameSidebar } from "@/components/ui/game-sidebar";
 import { useEffect, useState } from "react";
 
@@ -141,6 +142,7 @@ export default function GamePage() {
               {currentGame === "memory" && <MemoryGame />}
               {currentGame === "2048" && <Game2048 />}
               {currentGame === "space-invaders" && <SpaceInvadersGame />}
+              {currentGame === "chess" && <ChessGame />}
             </div>
 
             <div className="mt-12 pt-8 border-t border-white/20 text-center">

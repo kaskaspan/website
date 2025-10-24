@@ -92,7 +92,7 @@ export function SudokuGame() {
   // 生成数独谜题
   const generatePuzzle = useCallback(
     (difficulty: "easy" | "medium" | "hard") => {
-      const grid = Array(BOARD_SIZE)
+      const grid: Cell[][] = Array(BOARD_SIZE)
         .fill(null)
         .map(() =>
           Array(BOARD_SIZE)

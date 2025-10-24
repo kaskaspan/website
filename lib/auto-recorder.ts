@@ -1,5 +1,5 @@
 // 自动记录系统
-import { saveUserScore, getCurrentUser, type UserScore } from "./user-storage";
+import { saveUserScore, getCurrentUser } from "./user-storage";
 
 export interface GameSession {
   gameId: string;

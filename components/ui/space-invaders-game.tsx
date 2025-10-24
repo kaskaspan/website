@@ -55,7 +55,12 @@ export function SpaceInvadersGame() {
   });
 
   const [isPlaying, setIsPlaying] = useState(false);
-  const [gameRecorder, setGameRecorder] = useState<any>(null);
+  const [gameRecorder, setGameRecorder] = useState<{
+    updateScore: (score: number) => void;
+    endGame: (finalScore: number) => void;
+    getCurrentScore: () => number;
+    isActive: () => boolean;
+  } | null>(null);
   const [highScore, setHighScore] = useState(0);
   const [enemyDirection, setEnemyDirection] = useState(1);
   const [bulletIdCounter, setBulletIdCounter] = useState(0);
@@ -289,7 +294,7 @@ export function SpaceInvadersGame() {
       if (!isPlaying || gameState.gameOver || gameState.isPaused) return;
 
       setGameState((prevState) => {
-        let newPlayer = { ...prevState.player };
+        const newPlayer = { ...prevState.player };
 
         switch (e.key) {
           case "ArrowLeft":

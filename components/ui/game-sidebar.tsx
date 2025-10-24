@@ -27,6 +27,7 @@ const GAMES = [
     name: "🚀 Space Invaders",
     description: "Arcade shooter game",
   },
+  { id: "chess", name: "♟️ Chess", description: "Classic chess game" },
 ];
 
 export function GameSidebar({ currentGame, onGameSelect }: GameSidebarProps) {

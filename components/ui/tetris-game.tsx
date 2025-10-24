@@ -101,7 +101,12 @@ export function TetrisGame() {
   });
 
   const [isPlaying, setIsPlaying] = useState(false);
-  const [gameRecorder, setGameRecorder] = useState<any>(null);
+  const [gameRecorder, setGameRecorder] = useState<{
+    updateScore: (score: number) => void;
+    endGame: (finalScore: number) => void;
+    getCurrentScore: () => number;
+    isActive: () => boolean;
+  } | null>(null);
 
   // 生成随机方块
   const generatePiece = useCallback((): TetrisPiece => {
@@ -258,7 +263,7 @@ export function TetrisGame() {
       setGameState((prevState) => {
         if (!prevState.currentPiece) return prevState;
 
-        let newPosition = { ...prevState.currentPiece.position };
+        const newPosition = { ...prevState.currentPiece.position };
 
         switch (e.key) {
           case "ArrowLeft":
