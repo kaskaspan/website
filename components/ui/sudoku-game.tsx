@@ -53,7 +53,12 @@ export function SudokuGame() {
   });
 
   const [isPlaying, setIsPlaying] = useState(false);
-  const [gameRecorder, setGameRecorder] = useState<any>(null);
+  const [gameRecorder, setGameRecorder] = useState<{
+    updateScore: (score: number) => void;
+    endGame: (finalScore: number) => void;
+    getCurrentScore: () => number;
+    isActive: () => boolean;
+  } | null>(null);
 
   const DIFFICULTY_LEVELS = {
     easy: { givenCells: 45, name: "Easy" },

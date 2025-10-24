@@ -73,7 +73,12 @@ export function SnakeGame() {
     useState<keyof typeof DIFFICULTY_LEVELS>("medium");
 
   // 自动记录器
-  const [gameRecorder, setGameRecorder] = useState<any>(null);
+  const [gameRecorder, setGameRecorder] = useState<{
+    updateScore: (score: number) => void;
+    endGame: (finalScore: number) => void;
+    getCurrentScore: () => number;
+    isActive: () => boolean;
+  } | null>(null);
 
   // Generate random food with different types
   const generateFood = useCallback((): Food => {
@@ -250,6 +255,7 @@ export function SnakeGame() {
     gameState.speed,
     gameState.specialEffects,
     generateFood,
+    gameRecorder,
   ]);
 
   // Handle keyboard input

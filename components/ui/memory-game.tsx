@@ -59,7 +59,12 @@ export function MemoryGame() {
   });
 
   const [isPlaying, setIsPlaying] = useState(false);
-  const [gameRecorder, setGameRecorder] = useState<any>(null);
+  const [gameRecorder, setGameRecorder] = useState<{
+    updateScore: (score: number) => void;
+    endGame: (finalScore: number) => void;
+    getCurrentScore: () => number;
+    isActive: () => boolean;
+  } | null>(null);
   const [difficulty, setDifficulty] = useState<"easy" | "medium" | "hard">(
     "medium"
   );

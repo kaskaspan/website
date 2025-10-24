@@ -27,7 +27,12 @@ export function Game2048() {
   });
 
   const [isPlaying, setIsPlaying] = useState(false);
-  const [gameRecorder, setGameRecorder] = useState<any>(null);
+  const [gameRecorder, setGameRecorder] = useState<{
+    updateScore: (score: number) => void;
+    endGame: (finalScore: number) => void;
+    getCurrentScore: () => number;
+    isActive: () => boolean;
+  } | null>(null);
   const [highScore, setHighScore] = useState(0);
 
   // 获取随机空位置
@@ -246,7 +251,7 @@ export function Game2048() {
         if (!moved) return prevState;
 
         let updatedBoard = newBoard;
-        let newScore = prevState.score + scoreIncrease;
+        const newScore = prevState.score + scoreIncrease;
 
         // 添加新数字
         updatedBoard = addRandomNumber(updatedBoard);

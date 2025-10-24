@@ -118,7 +118,12 @@ export function BreakoutGame() {
   });
 
   const [isPlaying, setIsPlaying] = useState(false);
-  const [gameRecorder, setGameRecorder] = useState<any>(null);
+  const [gameRecorder, setGameRecorder] = useState<{
+    updateScore: (score: number) => void;
+    endGame: (finalScore: number) => void;
+    getCurrentScore: () => number;
+    isActive: () => boolean;
+  } | null>(null);
   const [difficulty, setDifficulty] =
     useState<keyof typeof DIFFICULTY_LEVELS>("medium");
   const [highScore, setHighScore] = useState(0);
@@ -232,7 +237,7 @@ export function BreakoutGame() {
       }
 
       // 检查砖块碰撞
-      let newBricks = [...prevState.bricks];
+      const newBricks = [...prevState.bricks];
       let newScore = prevState.score;
       let bricksDestroyed = 0;
 
