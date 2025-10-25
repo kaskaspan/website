@@ -10,6 +10,28 @@ import { MemoryGame } from "@/components/ui/memory-game";
 import { Game2048 } from "@/components/ui/2048-game";
 import { SpaceInvadersGame } from "@/components/ui/space-invaders-game";
 import { ChessGame } from "@/components/ui/chess-game";
+import { ColorfulTetrisGame } from "@/components/ui/colorful-tetris-game";
+import { AdvancedMinesweeperGame } from "@/components/ui/advanced-minesweeper-game";
+import { MultiplayerSnakeGame } from "@/components/ui/multiplayer-snake-game";
+import { TicTacToeGame } from "@/components/ui/tic-tac-toe-game";
+import { PuzzleGame } from "@/components/ui/puzzle-game";
+import { SpaceShooterGame } from "@/components/ui/space-shooter-game";
+import { RacingGame } from "@/components/ui/racing-game";
+import { PlatformerGame } from "@/components/ui/platformer-game";
+import { WordPuzzleGame } from "@/components/ui/word-puzzle-game";
+import { CardGame } from "@/components/ui/card-game";
+import { DungeonCrawlerGame } from "@/components/ui/dungeon-crawler-game";
+import { RhythmGame } from "@/components/ui/rhythm-game";
+import { TowerDefenseGame } from "@/components/ui/tower-defense-game";
+import { FroggerGame } from "@/components/ui/frogger-game";
+import { AsteroidsGame } from "@/components/ui/asteroids-game";
+import { ConnectFourGame } from "@/components/ui/connect-four-game";
+import { SolitaireGame } from "@/components/ui/solitaire-game";
+import { MahjongGame } from "@/components/ui/mahjong-game";
+import { BubbleShooterGame } from "@/components/ui/bubble-shooter-game";
+import { RoguelikeGame } from "@/components/ui/roguelike-game";
+import { MatchThreeGame } from "@/components/ui/match-three-game";
+import { BNIGame } from "@/components/ui/bni-game";
 import { GameSidebar } from "@/components/ui/game-sidebar";
 import { useEffect, useState } from "react";
 
@@ -143,6 +165,30 @@ export default function GamePage() {
               {currentGame === "2048" && <Game2048 />}
               {currentGame === "space-invaders" && <SpaceInvadersGame />}
               {currentGame === "chess" && <ChessGame />}
+              {currentGame === "colorful-tetris" && <ColorfulTetrisGame />}
+              {currentGame === "advanced-minesweeper" && (
+                <AdvancedMinesweeperGame />
+              )}
+              {currentGame === "multiplayer-snake" && <MultiplayerSnakeGame />}
+              {currentGame === "tic-tac-toe" && <TicTacToeGame />}
+              {currentGame === "puzzle" && <PuzzleGame />}
+              {currentGame === "space-shooter" && <SpaceShooterGame />}
+              {currentGame === "racing" && <RacingGame />}
+              {currentGame === "platformer" && <PlatformerGame />}
+              {currentGame === "word-puzzle" && <WordPuzzleGame />}
+              {currentGame === "card-game" && <CardGame />}
+              {currentGame === "dungeon-crawler" && <DungeonCrawlerGame />}
+              {currentGame === "rhythm-game" && <RhythmGame />}
+              {currentGame === "tower-defense" && <TowerDefenseGame />}
+              {currentGame === "frogger" && <FroggerGame />}
+              {currentGame === "asteroids" && <AsteroidsGame />}
+              {currentGame === "connect-four" && <ConnectFourGame />}
+              {currentGame === "solitaire" && <SolitaireGame />}
+              {currentGame === "mahjong" && <MahjongGame />}
+              {currentGame === "bubble-shooter" && <BubbleShooterGame />}
+              {currentGame === "roguelike" && <RoguelikeGame />}
+              {currentGame === "match-three" && <MatchThreeGame />}
+              {currentGame === "bni" && <BNIGame />}
             </div>
 
             <div className="mt-12 pt-8 border-t border-white/20 text-center">

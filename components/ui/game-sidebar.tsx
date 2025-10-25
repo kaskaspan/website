@@ -28,6 +28,84 @@ const GAMES = [
     description: "Arcade shooter game",
   },
   { id: "chess", name: "♟️ Chess", description: "Classic chess game" },
+  {
+    id: "colorful-tetris",
+    name: "🌈 Colorful Tetris",
+    description: "Colorful block puzzle",
+  },
+  {
+    id: "advanced-minesweeper",
+    name: "💣 Advanced Minesweeper",
+    description: "Enhanced mine game",
+  },
+  {
+    id: "multiplayer-snake",
+    name: "🐍🐍 Multiplayer Snake",
+    description: "Two player snake",
+  },
+  {
+    id: "tic-tac-toe",
+    name: "⭕❌ Tic Tac Toe",
+    description: "Classic tic tac toe",
+  },
+  { id: "puzzle", name: "🧩 Puzzle", description: "Number sliding puzzle" },
+  {
+    id: "space-shooter",
+    name: "🚀 Space Shooter",
+    description: "Space combat game",
+  },
+  { id: "racing", name: "🏎️ Racing", description: "Car racing game" },
+  { id: "platformer", name: "🦘 Platformer", description: "Jump and run game" },
+  {
+    id: "word-puzzle",
+    name: "📝 Word Puzzle",
+    description: "Word guessing game",
+  },
+  { id: "card-game", name: "🃏 Card Game", description: "Classic card game" },
+  {
+    id: "dungeon-crawler",
+    name: "🗡️ Dungeon Crawler",
+    description: "Adventure game",
+  },
+  {
+    id: "rhythm-game",
+    name: "🎵 Rhythm Game",
+    description: "Music rhythm game",
+  },
+  {
+    id: "tower-defense",
+    name: "🏰 Tower Defense",
+    description: "Strategy defense game",
+  },
+  { id: "frogger", name: "🐸 Frogger", description: "Cross the road game" },
+  { id: "asteroids", name: "🪨 Asteroids", description: "Space shooter game" },
+  {
+    id: "connect-four",
+    name: "🔴🟡 Connect Four",
+    description: "Four in a row game",
+  },
+  { id: "solitaire", name: "🃏 Solitaire", description: "Classic card game" },
+  { id: "mahjong", name: "🀄 Mahjong", description: "Tile matching game" },
+  {
+    id: "bubble-shooter",
+    name: "🫧 Bubble Shooter",
+    description: "Bubble popping game",
+  },
+  {
+    id: "match-three",
+    name: "💎 Match Three",
+    description: "Gem matching game",
+  },
+  {
+    id: "roguelike",
+    name: "🗡️ Roguelike",
+    description: "Dungeon exploration game",
+  },
+  {
+    id: "bni",
+    name: "🔋 BNI",
+    description: "Batteries Not Included - Robot defense game",
+  },
 ];
 
 export function GameSidebar({ currentGame, onGameSelect }: GameSidebarProps) {
@@ -53,7 +131,7 @@ export function GameSidebar({ currentGame, onGameSelect }: GameSidebarProps) {
         isCollapsed ? "w-16" : "w-64"
       }`}
     >
-      <div className="p-4">
+      <div className="p-4 h-full flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           {!isCollapsed && (
@@ -70,7 +148,7 @@ export function GameSidebar({ currentGame, onGameSelect }: GameSidebarProps) {
         </div>
 
         {/* Game List */}
-        <div className="space-y-2">
+        <div className="space-y-2 flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent">
           {GAMES.map((game) => (
             <Button
               key={game.id}
@@ -96,7 +174,7 @@ export function GameSidebar({ currentGame, onGameSelect }: GameSidebarProps) {
 
         {/* Stats */}
         {!isCollapsed && (
-          <div className="mt-6 p-3 bg-white/10 rounded-lg">
+          <div className="mt-6 p-3 bg-white/10 rounded-lg flex-shrink-0">
             <h3 className="text-sm font-bold text-white mb-2">📊 Game Stats</h3>
             <div className="space-y-1 text-xs text-white/70">
               <div>Total Games: {GAMES.length}</div>
@@ -110,7 +188,7 @@ export function GameSidebar({ currentGame, onGameSelect }: GameSidebarProps) {
 
         {/* Quick Actions */}
         {!isCollapsed && (
-          <div className="mt-4 space-y-2">
+          <div className="mt-4 space-y-2 flex-shrink-0">
             <Button
               variant="outline"
               size="sm"
