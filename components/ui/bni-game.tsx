@@ -309,7 +309,7 @@ export function BNIGame() {
                 batteries: prev.batteries + 1,
               };
             }
-            break;
+            return prev;
           case "charge":
             if (prev.batteries > 0) {
               return {
@@ -322,7 +322,7 @@ export function BNIGame() {
                 ),
               };
             }
-            break;
+            return prev;
           case "repair":
             if (prev.scrap >= 3) {
               return {
@@ -337,9 +337,10 @@ export function BNIGame() {
                 },
               };
             }
-            break;
+            return prev;
+          default:
+            return prev;
         }
-        return prev;
       });
     },
     [selectedRobot]
