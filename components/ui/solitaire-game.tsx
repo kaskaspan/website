@@ -48,6 +48,7 @@ interface CardType {
   value: number;
   color: "red" | "black";
   id: string;
+  faceUp?: boolean;
 }
 
 // 游戏状态
@@ -198,10 +199,12 @@ export function SolitaireGame() {
         const newState = { ...prev };
 
         // 从源堆移除牌
-        let card: CardType;
+        let card: CardType | null = null;
         if (fromPile === "stock") {
           card = newState.stock.pop()!;
-          newState.waste.push({ ...card, faceUp: true });
+          if (card) {
+            newState.waste.push({ ...card, faceUp: true });
+          }
         } else if (fromPile === "waste") {
           card = newState.waste.pop()!;
         } else if (fromPile.startsWith("tableau-")) {
@@ -221,6 +224,11 @@ export function SolitaireGame() {
         } else if (fromPile.startsWith("foundation-")) {
           const suit = fromPile.split("-")[1] as (typeof SUITS)[number];
           card = newState.foundations[suit].pop()!;
+        }
+
+        // 如果没有牌可移动，返回原状态
+        if (!card) {
+          return newState;
         }
 
         // 移动到目标堆

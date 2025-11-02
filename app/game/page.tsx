@@ -31,9 +31,15 @@ import { MahjongGame } from "@/components/ui/mahjong-game";
 import { BubbleShooterGame } from "@/components/ui/bubble-shooter-game";
 import { RoguelikeGame } from "@/components/ui/roguelike-game";
 import { MatchThreeGame } from "@/components/ui/match-three-game";
-import { BNIGame } from "@/components/ui/bni-game";
+import { FlappyBirdGame } from "@/components/ui/flappy-bird-game";
+import { DoodleJumpGame } from "@/components/ui/doodle-jump-game";
+import { ColorSwitchGame } from "@/components/ui/color-switch-game";
+import { CrossyRoadGame } from "@/components/ui/crossy-road-game";
+import { BallGame } from "@/components/ui/ball-game";
+import { SlitherGame } from "@/components/ui/slither-game";
 import { GameSidebar } from "@/components/ui/game-sidebar";
 import { useEffect, useState } from "react";
+import { IconCloud } from "@/components/ui/icon-cloud";
 
 export default function GamePage() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
@@ -144,6 +150,26 @@ export default function GamePage() {
         {/* Main Content */}
         <div className="flex-1 p-8 pb-20 gap-16 sm:p-20">
           <main className="max-w-4xl mx-auto">
+            {/* Game Emoji Cloud */}
+            <div className="mb-8 h-32 w-full">
+              <IconCloud
+                emojis={[
+                  "🎮",
+                  "🎯",
+                  "🎲",
+                  "🎰",
+                  "🃏",
+                  "🎴",
+                  "🧩",
+                  "🕹️",
+                  "🎪",
+                  "🎨",
+                  "🎭",
+                  "🎬",
+                ]}
+              />
+            </div>
+
             <div className="text-center mb-8">
               <h1 className="text-6xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent mb-4">
                 🎮 Game Zone
@@ -188,7 +214,12 @@ export default function GamePage() {
               {currentGame === "bubble-shooter" && <BubbleShooterGame />}
               {currentGame === "roguelike" && <RoguelikeGame />}
               {currentGame === "match-three" && <MatchThreeGame />}
-              {currentGame === "bni" && <BNIGame />}
+              {currentGame === "flappy-bird" && <FlappyBirdGame />}
+              {currentGame === "doodle-jump" && <DoodleJumpGame />}
+              {currentGame === "color-switch" && <ColorSwitchGame />}
+              {currentGame === "crossy-road" && <CrossyRoadGame />}
+              {currentGame === "ball-game" && <BallGame />}
+              {currentGame === "slither" && <SlitherGame />}
             </div>
 
             <div className="mt-12 pt-8 border-t border-white/20 text-center">

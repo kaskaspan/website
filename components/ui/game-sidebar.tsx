@@ -102,9 +102,34 @@ const GAMES = [
     description: "Dungeon exploration game",
   },
   {
-    id: "bni",
-    name: "🔋 BNI",
-    description: "Batteries Not Included - Robot defense game",
+    id: "flappy-bird",
+    name: "🐦 Flappy Bird",
+    description: "Classic flappy bird game",
+  },
+  {
+    id: "doodle-jump",
+    name: "📱 Doodle Jump",
+    description: "Jump between platforms",
+  },
+  {
+    id: "color-switch",
+    name: "🌈 Color Switch",
+    description: "Match colors to pass",
+  },
+  {
+    id: "crossy-road",
+    name: "🦘 Crossy Road",
+    description: "Cross the road game",
+  },
+  {
+    id: "ball-game",
+    name: "⚽ Ball Game",
+    description: "Keep the ball bouncing",
+  },
+  {
+    id: "slither",
+    name: "🐍 Slither.io",
+    description: "Eat and grow longer",
   },
 ];
 
@@ -133,7 +158,7 @@ export function GameSidebar({ currentGame, onGameSelect }: GameSidebarProps) {
     >
       <div className="p-4 h-full flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between mb-4">
           {!isCollapsed && (
             <h2 className="text-xl font-bold text-white">🎮 Game Center</h2>
           )}
@@ -146,6 +171,11 @@ export function GameSidebar({ currentGame, onGameSelect }: GameSidebarProps) {
             {isCollapsed ? "→" : "←"}
           </Button>
         </div>
+
+        {/* Divider */}
+        {!isCollapsed && (
+          <div className="w-full h-px bg-gradient-to-r from-transparent via-white/20 to-transparent mb-4" />
+        )}
 
         {/* Game List */}
         <div className="space-y-2 flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent">

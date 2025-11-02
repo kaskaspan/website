@@ -336,8 +336,8 @@ export function MahjongGame() {
   const initializeGame = useCallback(() => {
     const tiles = createTiles();
     const shuffledTiles = shuffleTiles(tiles);
-    const layoutTiles = layoutTiles(shuffledTiles);
-    const tilesWithBlocked = updateBlockedStatus(layoutTiles);
+    const arrangedTiles = layoutTiles(shuffledTiles);
+    const tilesWithBlocked = updateBlockedStatus(arrangedTiles);
 
     return {
       tiles: tilesWithBlocked,

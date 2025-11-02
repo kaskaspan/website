@@ -130,10 +130,10 @@ export function RhythmGame() {
           (note) => note.y > TRACK_HEIGHT + 50 && !note.isActive
         );
 
-        let newScore = prev.score;
+        const newScore = prev.score;
         let newCombo = prev.combo;
         let newMiss = prev.miss;
-        let newMaxCombo = prev.maxCombo;
+        const newMaxCombo = prev.maxCombo;
 
         // 处理错过的音符
         if (missedNotes.length > 0) {

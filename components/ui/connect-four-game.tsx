@@ -145,7 +145,9 @@ export function ConnectFourGame() {
         // 检查胜利
         const isWin = checkWin(newBoard, row, col, prev.currentPlayer);
         let gameOver = isWin;
-        let winner = isWin ? prev.currentPlayer : null;
+        let winner: "red" | "yellow" | "draw" | null = isWin
+          ? prev.currentPlayer
+          : null;
 
         // 检查平局
         if (!isWin && newMoves === BOARD_WIDTH * BOARD_HEIGHT) {

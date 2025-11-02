@@ -206,11 +206,12 @@ export function TicTacToeGame() {
   // 处理单元格点击
   const handleCellClick = useCallback(
     (x: number, y: number) => {
-      if (gameState.gameOver || gameState.board[y][x] !== null) return;
-      if (gameState.gameMode === "ai" && gameState.currentPlayer === "O")
-        return;
-
       setGameState((prevState) => {
+        if (prevState.gameOver || prevState.board[y][x] !== null)
+          return prevState;
+        if (prevState.gameMode === "ai" && prevState.currentPlayer === "O")
+          return prevState;
+
         const newBoard = prevState.board.map((row) => [...row]);
         newBoard[y][x] = prevState.currentPlayer;
 
@@ -241,15 +242,7 @@ export function TicTacToeGame() {
         return newState;
       });
     },
-    [
-      gameState.gameOver,
-      gameState.board,
-      gameState.gameMode,
-      gameState.currentPlayer,
-      checkWinner,
-      checkDraw,
-      gameRecorder,
-    ]
+    [checkWinner, checkDraw, gameRecorder]
   );
 
   // AI 移动
