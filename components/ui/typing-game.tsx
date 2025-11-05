@@ -202,7 +202,7 @@ export function TypingGame({ onPlayingChange }: TypingGameProps) {
           {!isPlaying ? (
             <div className="text-center py-12">
               <p className="text-white/70 text-lg mb-4">
-                Click "Start Game" to begin typing!
+                Click &quot;Start Game&quot; to begin typing!
               </p>
               <Button
                 onClick={startGame}
@@ -214,8 +214,8 @@ export function TypingGame({ onPlayingChange }: TypingGameProps) {
           ) : (
             <div className="text-xl leading-relaxed font-mono">
               {chars.split("").map((char, index) => {
-                let state = charsState[index];
-                let color =
+                const state = charsState[index];
+                const color =
                   state === CharStateType.Incomplete
                     ? "text-white/50"
                     : state === CharStateType.Correct
