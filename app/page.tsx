@@ -200,6 +200,12 @@ export default function Home() {
             </Button>
             <Button
               asChild
+              className="bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 text-white border-0"
+            >
+              <Link href="/typing-game">⌨️ Typing Game</Link>
+            </Button>
+            <Button
+              asChild
               className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white border-0"
             >
               <Link href="/access">how to access</Link>

@@ -40,6 +40,7 @@ import { SlitherGame } from "@/components/ui/slither-game";
 import { GameSidebar } from "@/components/ui/game-sidebar";
 import { useEffect, useState } from "react";
 import { IconCloud } from "@/components/ui/icon-cloud";
+import { SmoothCursor } from "@/registry/magicui/smooth-cursor";
 
 export default function GamePage() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
@@ -178,6 +179,13 @@ export default function GamePage() {
               <p className="text-white/70 text-lg">
                 Welcome to the fun game section! Choose a game from the sidebar.
               </p>
+              <div className="mt-4 text-white/50 text-sm">
+                <span className="hidden md:block">Move your mouse around</span>
+                <span className="block md:hidden">
+                  Tap anywhere to see the cursor
+                </span>
+              </div>
+              <SmoothCursor />
             </div>
 
             {/* Game Content */}

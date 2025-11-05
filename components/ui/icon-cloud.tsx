@@ -20,10 +20,10 @@ export function IconCloud({
         "relative flex size-full items-center justify-center overflow-hidden",
         className
       )}
-    >
-      <div className="relative flex flex-wrap justify-center gap-4">
+      >
+        <div className="relative flex flex-wrap justify-center gap-4">
         {displayItems.slice(0, 12).map((item, i) => {
-          return (
+            return (
             <div key={i} className="relative">
               {emojis ? (
                 <div className="text-4xl opacity-80 hover:opacity-100 transition-opacity">
@@ -39,9 +39,9 @@ export function IconCloud({
                   }}
                 />
               )}
-            </div>
-          );
-        })}
+              </div>
+            );
+          })}
       </div>
     </div>
   );

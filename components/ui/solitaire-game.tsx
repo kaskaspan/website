@@ -203,7 +203,7 @@ export function SolitaireGame() {
         if (fromPile === "stock") {
           card = newState.stock.pop()!;
           if (card) {
-            newState.waste.push({ ...card, faceUp: true });
+          newState.waste.push({ ...card, faceUp: true });
           }
         } else if (fromPile === "waste") {
           card = newState.waste.pop()!;
