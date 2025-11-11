@@ -23,7 +23,6 @@ export function LoginForm() {
       const result = await login(username);
 
       if (result.success) {
-        // Redirect to home page after successful login
         router.push("/");
         router.refresh();
       } else {
@@ -45,9 +44,7 @@ export function LoginForm() {
           <h1 className="text-3xl font-bold text-white mb-2">
             Analytics Dashboard
           </h1>
-          <p className="text-white/70">
-            Sign in to access website analytics data
-          </p>
+          <p className="text-white/70">Sign in to access website analytics data</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">

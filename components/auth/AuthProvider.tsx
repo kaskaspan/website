@@ -51,7 +51,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   useEffect(() => {
-    // Initialize auth state from localStorage
     initializeAuth();
     checkAuth();
   }, []);

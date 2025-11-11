@@ -4,6 +4,7 @@ import "./globals.css";
 import { OfflineDetector } from "@/components/ui/offline-detector";
 import { GoogleAnalytics } from "@/components/analytics/GoogleAnalytics";
 import { AuthProvider } from "@/components/auth/AuthProvider";
+import { StoreProvider } from "@/store/StoreProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,12 +31,14 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <AuthProvider>
-          <OfflineDetector />
-          {/* Google Analytics - Replace with your Measurement ID */}
-          <GoogleAnalytics measurementId="G-XXXXXXXXXX" />
-          {children}
-        </AuthProvider>
+        <StoreProvider>
+          <AuthProvider>
+            <OfflineDetector />
+            {/* Google Analytics - Replace with your Measurement ID */}
+            <GoogleAnalytics measurementId="G-XXXXXXXXXX" />
+            {children}
+          </AuthProvider>
+        </StoreProvider>
       </body>
     </html>
   );

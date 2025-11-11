@@ -2,22 +2,93 @@
 
 import Link from "next/link";
 import { TypingGame } from "@/components/ui/typing-game";
-import { useState, useEffect } from "react";
+import { TypingGameSidebar } from "@/components/ui/typing-game-sidebar";
+import { TypingGameRightSidebar } from "@/components/ui/typing-game-right-sidebar";
+import { useState, useEffect, useCallback } from "react";
 import { SmoothCursor } from "@/registry/magicui/smooth-cursor";
+import { Button } from "@/components/ui/button";
+import { LogIn, UserRound } from "lucide-react";
 
 export default function TypingGamePage() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [isGamePlaying, setIsGamePlaying] = useState(false);
+  const [currentMode, setCurrentMode] = useState("classic");
+  const [gameStats, setGameStats] = useState({
+    wpm: 0,
+    accuracy: 100,
+    correctChars: 0,
+    errorChars: 0,
+    highScore: 0,
+    durationMs: 0,
+    stars: 0,
+    isCompleted: false,
+  });
+
+  const handleMouseMove = useCallback((e: MouseEvent) => {
+    setMousePosition((prev) => {
+      const next = { x: e.clientX, y: e.clientY };
+      if (prev.x === next.x && prev.y === next.y) {
+        return prev;
+      }
+      return next;
+    });
+  }, []);
 
   useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      setMousePosition({ x: e.clientX, y: e.clientY });
-    };
+    if (typeof window === "undefined") return;
 
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+    };
+  }, [handleMouseMove]);
+
+  // 从 localStorage 加载最高分
+  useEffect(() => {
     if (typeof window !== "undefined") {
-      window.addEventListener("mousemove", handleMouseMove);
-      return () => window.removeEventListener("mousemove", handleMouseMove);
+      const savedHighScore = localStorage.getItem("typingGameHighScore");
+      if (savedHighScore) {
+        setGameStats((prev) => ({
+          ...prev,
+          highScore: parseInt(savedHighScore, 10),
+        }));
+      }
     }
+  }, []);
+
+  const handleStatsUpdate = useCallback((stats: {
+    wpm: number;
+    accuracy: number;
+    correctChars: number;
+    errorChars: number;
+    highScore?: number;
+    durationMs: number;
+    stars: number;
+    isCompleted: boolean;
+  }) => {
+    setGameStats((prev) => {
+      const newHighScore = stats.highScore ?? prev.highScore;
+      const nextState = {
+        ...prev,
+        ...stats,
+        highScore: Math.max(prev.highScore, newHighScore),
+      };
+
+      const hasChanged = Object.keys(nextState).some((key) => {
+        const typedKey = key as keyof typeof nextState;
+        return nextState[typedKey] !== prev[typedKey];
+      });
+
+      if (!hasChanged) {
+        return prev;
+      }
+
+      if (nextState.highScore > prev.highScore && typeof window !== "undefined") {
+        localStorage.setItem("typingGameHighScore", nextState.highScore.toString());
+      }
+
+      return nextState;
+    });
   }, []);
 
   return (
@@ -101,34 +172,94 @@ export default function TypingGamePage() {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 min-h-screen flex items-center justify-center p-8 pb-20">
-        <div className="w-full max-w-6xl">
-          <div className="text-center mb-8">
-            <h1 className="text-6xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent mb-4">
-              ⌨️ Typing Game
-            </h1>
-            <div className="w-24 h-1 bg-gradient-to-r from-purple-500 to-blue-500 mx-auto mb-8" />
-            <p className="text-white/70 text-lg">
-              Improve your typing speed and accuracy
-            </p>
-            <SmoothCursor enabled={!isGamePlaying} />
-          </div>
+      <div className="relative z-10 min-h-screen flex">
+        {/* Left Sidebar */}
+        <div className="hidden lg:block">
+          <TypingGameSidebar
+            currentMode={currentMode}
+            onModeSelect={setCurrentMode}
+          />
+        </div>
 
-          {/* Game Component */}
-          <TypingGame onPlayingChange={setIsGamePlaying} />
+        {/* Main Content */}
+        <div className="flex-1 p-8 pb-20 gap-16 sm:p-20">
+          <main className="max-w-4xl mx-auto">
+            <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+              <div className="flex items-center gap-3 text-white/70 text-sm">
+                <Link
+                  href="/"
+                  className="rounded-full border border-white/10 px-3 py-1 text-white/80 hover:border-white/40 hover:text-white transition"
+                >
+                  ⬅️ 返回首页
+                </Link>
+                <span className="hidden md:block text-white/40">|</span>
+                <span className="hidden md:block">盲打教程 · 新手到高手路线</span>
+              </div>
 
-          {/* Back Button */}
-          <div className="mt-12 pt-8 border-t border-white/20 text-center">
-            <Link
-              href="/"
-              className="group inline-flex items-center gap-2 px-8 py-3 bg-gradient-to-r from-purple-600/20 to-blue-600/20 text-blue-400 hover:text-white hover:from-purple-600/40 hover:to-blue-600/40 rounded-full border border-blue-400/30 hover:border-purple-400/50 transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:shadow-purple-500/25"
-            >
-              <span className="group-hover:-translate-x-1 transition-transform duration-300">
-                ←
-              </span>
-              <span>Back to Home</span>
-            </Link>
-          </div>
+              <div className="flex items-center gap-3">
+                <Button asChild variant="ghost" className="text-white/80 hover:text-white">
+                  <Link href="/login" className="flex items-center gap-2">
+                    <LogIn className="h-4 w-4" />
+                    登录
+                  </Link>
+                </Button>
+                <Button
+                  asChild
+                  variant="outline"
+                  className="border-white/30 text-white/90 hover:bg-white/10"
+                >
+                  <Link href="/profile" className="flex items-center gap-2">
+                    <UserRound className="h-4 w-4" />
+                    个人资料
+                  </Link>
+                </Button>
+              </div>
+            </div>
+
+            <div className="text-center mb-8">
+              <h1 className="text-6xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent mb-4">
+                ⌨️ Typing Game
+              </h1>
+              <div className="w-24 h-1 bg-gradient-to-r from-purple-500 to-blue-500 mx-auto mb-8" />
+              <p className="text-white/70 text-lg">
+                Improve your typing speed and accuracy
+              </p>
+              <SmoothCursor enabled={!isGamePlaying} />
+            </div>
+
+            {/* Game Component */}
+            <TypingGame
+              onPlayingChange={setIsGamePlaying}
+              onStatsUpdate={handleStatsUpdate}
+            />
+
+            {/* Back Button */}
+            <div className="mt-12 pt-8 border-t border-white/20 text-center">
+              <Link
+                href="/"
+                className="group inline-flex items-center gap-2 px-8 py-3 bg-gradient-to-r from-purple-600/20 to-blue-600/20 text-blue-400 hover:text-white hover:from-purple-600/40 hover:to-blue-600/40 rounded-full border border-blue-400/30 hover:border-purple-400/50 transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:shadow-purple-500/25"
+              >
+                <span className="group-hover:-translate-x-1 transition-transform duration-300">
+                  ←
+                </span>
+                <span>Back to Home</span>
+              </Link>
+            </div>
+          </main>
+        </div>
+
+        {/* Right Sidebar */}
+        <div className="hidden xl:block">
+          <TypingGameRightSidebar
+            wpm={gameStats.wpm}
+            accuracy={gameStats.accuracy}
+            correctChars={gameStats.correctChars}
+            errorChars={gameStats.errorChars}
+            highScore={gameStats.highScore}
+            durationMs={gameStats.durationMs}
+            stars={gameStats.stars}
+            isCompleted={gameStats.isCompleted}
+          />
         </div>
       </div>
     </div>

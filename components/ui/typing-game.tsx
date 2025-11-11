@@ -1,33 +1,178 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import useTypingGame, {
-  CharStateType,
   PhaseType,
 } from "react-typing-game-hook";
 import { integrateGameWithAutoRecorder } from "@/lib/auto-recorder";
+import { addTypingSession } from "@/lib/typing-analytics";
+import {
+  TextDisplay,
+  VirtualKeyboard,
+  StatsPanel,
+  TypingController,
+  VirtualHands,
+} from "@/components/ui/typing/core";
+import { LessonSelector } from "@/components/ui/typing/lessons";
+import { TypingSettingsPanel } from "@/components/ui/typing/settings";
+import { useKeySound } from "@/hooks/useKeySound";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import {
+  startSession,
+  recordKeystroke,
+  setSessionElapsed,
+  endSession as endSessionAction,
+  resetSession,
+  updateCursor,
+  completeLesson,
+  selectLesson,
+} from "@/store/slices";
+import type { SessionSummary } from "@/types";
+import type { LessonContent } from "@/types";
+import Link from "next/link";
 
-const TYPING_TEXTS = [
-  "The quick brown fox jumps over the lazy dog.",
-  "Programming is the art of telling a computer what to do through a series of instructions.",
-  "Practice makes perfect when it comes to typing speed and accuracy.",
-  "The best way to learn coding is by building projects and solving real problems.",
-  "React is a powerful library for building user interfaces with reusable components.",
-  "TypeScript provides type safety and better developer experience for JavaScript projects.",
-  "Web development combines creativity with technical skills to create amazing experiences.",
-  "The journey of a thousand miles begins with a single step.",
-  "Innovation distinguishes between a leader and a follower.",
-  "Success is not final, failure is not fatal: it is the courage to continue that counts.",
+const KEY_GUIDES = [
+  {
+    id: "posture",
+    title: "准备姿势",
+    keys: ["坐姿", "视线"],
+    finger: "放松肩膀",
+    description: "坐直、手腕微抬，双眼看屏幕而非键盘。",
+  },
+  {
+    id: "home-jf",
+    title: "基准键 J · F",
+    keys: ["J", "F"],
+    finger: "双食指",
+    description: "轻触凸点，随时回到这两个起点。",
+  },
+  {
+    id: "home-kd",
+    title: "延伸键 K · D",
+    keys: ["K", "D"],
+    finger: "外伸食指",
+    description: "向上或向下后迅速回到 J/F。",
+  },
+  {
+    id: "home-ls",
+    title: "延伸键 L · S",
+    keys: ["L", "S"],
+    finger: "双中指",
+    description: "保持节奏，避免手腕晃动。",
+  },
+  {
+    id: "home-a;",
+    title: "延伸键 A · ;",
+    keys: ["A", ";"],
+    finger: "双无名指",
+    description: "指尖触底即可，不要压紧。",
+  },
+  {
+    id: "shift-enter",
+    title: "Shift · Enter",
+    keys: ["Shift", "Enter"],
+    finger: "双小指",
+    description: "左手 Shift 配右手字母，换行用右手 Enter。",
+  },
+  {
+    id: "top-row",
+    title: "上排字母",
+    keys: ["R", "T", "Y", "U"],
+    finger: "向上延伸",
+    description: "移动来自手指而非手臂。",
+  },
+  {
+    id: "numbers",
+    title: "数字行",
+    keys: ["1", "2", "3", "4"],
+    finger: "稳住手腕",
+    description: "手指抬高后落下，仍要回到基准键。",
+  },
+  {
+    id: "symbols",
+    title: "符号搭配",
+    keys: [",", ".", "/"],
+    finger: "协调小指",
+    description: "保持节奏，避免看键盘。",
+  },
 ];
+
+const SKILL_MILESTONES = [
+  {
+    id: "beginner",
+    label: "初学者",
+    requirement: "稳定掌握 J · F",
+    starsNeeded: 1,
+  },
+  {
+    id: "explorer",
+    label: "进阶",
+    requirement: "熟悉 KD / LS",
+    starsNeeded: 3,
+  },
+  {
+    id: "advanced",
+    label: "高手",
+    requirement: "4 ⭐ 即可进入下一阶段",
+    starsNeeded: 4,
+  },
+  {
+    id: "master",
+    label: "大师",
+    requirement: "满 5 ⭐ 全键盲打",
+    starsNeeded: 5,
+  },
+];
+
+const DEFAULT_FALLBACK_TEXT = "The quick brown fox jumps over the lazy dog.";
+
+function calculateStarRating(wpm: number, accuracy: number) {
+  if (wpm === 0) return 0;
+
+  let stars = 1;
+  if (wpm >= 20 && accuracy >= 80) stars = 2;
+  if (wpm >= 35 && accuracy >= 88) stars = 3;
+  if (wpm >= 45 && accuracy >= 92) stars = 4;
+  if (wpm >= 60 && accuracy >= 95) stars = 5;
+  return stars;
+}
+
+const formatDuration = (ms: number) => {
+  if (ms <= 0) return "0:00";
+  const totalSeconds = Math.floor(ms / 1000);
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+};
 
 interface TypingGameProps {
   onPlayingChange?: (isPlaying: boolean) => void;
+  onStatsUpdate?: (stats: {
+    wpm: number;
+    accuracy: number;
+    correctChars: number;
+    errorChars: number;
+    highScore?: number;
+    durationMs: number;
+    stars: number;
+    isCompleted: boolean;
+  }) => void;
 }
 
-export function TypingGame({ onPlayingChange }: TypingGameProps) {
-  const [textIndex, setTextIndex] = useState(0);
+export function TypingGame({
+  onPlayingChange,
+  onStatsUpdate,
+}: TypingGameProps) {
+  const dispatch = useAppDispatch();
+  const {
+    selectedLessonId,
+    tracks,
+    contents,
+    recommendedLessonIds,
+  } = useAppSelector((state) => state.curriculum);
+  const preferences = useAppSelector((state) => state.preferences.value);
   const [isPlaying, setIsPlaying] = useState(false);
   const [highScore, setHighScore] = useState(0);
   const [gameRecorder, setGameRecorder] = useState<{
@@ -36,85 +181,134 @@ export function TypingGame({ onPlayingChange }: TypingGameProps) {
     getCurrentScore: () => number;
     isActive: () => boolean;
   } | null>(null);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
-  const currentText = TYPING_TEXTS[textIndex];
+  const activeLesson = useMemo(() => {
+    if (!selectedLessonId) return null;
+    for (const track of tracks) {
+      const lesson = track.lessons.find((item) => item.id === selectedLessonId);
+      if (lesson) {
+        const content = lesson.contentRef ? contents[lesson.contentRef] : undefined;
+        return {
+          track: { id: track.id, name: track.name, difficultyIndex: track.difficultyIndex },
+          lesson,
+          content,
+        } as const;
+      }
+    }
+    return null;
+  }, [contents, selectedLessonId, tracks]);
+
+  const lessonText = useMemo(() => {
+    const text = activeLesson?.content
+      ? extractLessonText(activeLesson.content)
+      : "";
+    return text || DEFAULT_FALLBACK_TEXT;
+  }, [activeLesson]);
+
+  const lessonTitle = activeLesson?.lesson.title ?? "自由练习";
+  const lessonId = activeLesson?.lesson.id ?? "custom-lesson";
+  const audioPrefs = preferences.audio;
+  const layoutPrefs = preferences.layout;
 
   const {
     states: {
       chars,
-      charsState,
       currIndex,
       correctChar,
       errorChar,
       phase,
       startTime,
-      endTime,
     },
     actions: { insertTyping, resetTyping, deleteTyping, getDuration },
-  } = useTypingGame(currentText, {
+  } = useTypingGame(lessonText, {
     skipCurrentWordOnSpace: true,
     pauseOnError: false,
     countErrors: "everytime",
   });
 
-  // 计算 WPM (Words Per Minute)
-  const calculateWPM = () => {
+  const prevCorrectRef = useRef(correctChar);
+  const prevErrorRef = useRef(errorChar);
+  const prevDurationRef = useRef(0);
+
+  const { playKey, playError } = useKeySound({
+    enabled: audioPrefs.keySoundEnabled,
+    masterVolume: audioPrefs.masterVolume,
+    keyVolume: audioPrefs.keySoundVolume,
+    presetId: audioPrefs.keySoundProfile,
+  });
+
+  const calculateWPM = useCallback(() => {
     if (!startTime || phase === PhaseType.NotStarted) return 0;
     const duration = getDuration();
     if (duration === 0) return 0;
     const minutes = duration / 60000;
-    const words = correctChar / 5; // 平均每个单词5个字符
+    const words = correctChar / 5;
     return Math.round(words / minutes);
-  };
+  }, [correctChar, getDuration, phase, startTime]);
 
-  // 计算准确率
-  const calculateAccuracy = () => {
+  const calculateAccuracy = useCallback(() => {
     const totalChars = correctChar + errorChar;
     if (totalChars === 0) return 100;
     return Math.round((correctChar / totalChars) * 100);
-  };
+  }, [correctChar, errorChar]);
 
-  // 开始游戏
-  const startGame = () => {
-    resetTyping();
-    setIsPlaying(true);
-    onPlayingChange?.(true);
-    const recorder = integrateGameWithAutoRecorder(
-      "Typing Game",
-      "typing-game"
-    );
-    setGameRecorder(recorder);
-  };
+  const wpm = useMemo(() => calculateWPM(), [calculateWPM]);
+  const accuracy = useMemo(() => calculateAccuracy(), [calculateAccuracy]);
+  const duration = useMemo(() => getDuration(), [getDuration]);
+  const stars = useMemo(() => calculateStarRating(wpm, accuracy), [wpm, accuracy]);
 
-  // 重置游戏
-  const resetGame = () => {
+  const keyboardStates = useMemo(() => {
+    if (!isPlaying) return {} as Record<string, "hint">;
+    const currentChar = chars[currIndex]?.toLowerCase();
+    if (!currentChar) return {} as Record<string, "hint">;
+    return { [currentChar]: "hint" } as Record<string, "hint">;
+  }, [isPlaying, chars, currIndex]);
+
+  useEffect(() => {
     setIsPlaying(false);
-    onPlayingChange?.(false);
+    dispatch(resetSession());
     resetTyping();
-    if (gameRecorder) {
-      const finalScore = calculateWPM() * 10 + calculateAccuracy();
-      gameRecorder.endGame(finalScore);
-    }
-  };
+    prevCorrectRef.current = 0;
+    prevErrorRef.current = 0;
+    prevDurationRef.current = 0;
+  }, [dispatch, lessonText, resetTyping]);
 
-  // 选择新文本
-  const selectNewText = () => {
-    const newIndex = Math.floor(Math.random() * TYPING_TEXTS.length);
-    setTextIndex(newIndex);
-    resetTyping();
-  };
-
-  // 检查游戏是否完成
   useEffect(() => {
     if (phase === PhaseType.Ended && isPlaying) {
-      const wpm = calculateWPM();
-      const acc = calculateAccuracy();
-      const finalScore = wpm * 10 + acc;
+      const endScore = wpm * 10 + accuracy;
+
+      const totalChars = correctChar + errorChar;
+      const summary: SessionSummary = {
+        durationMs: duration,
+        wpm,
+        cpm:
+          duration > 0 ? Math.round((correctChar / duration) * 60000) : 0,
+        accuracy,
+        errorRate: totalChars > 0 ? errorChar / totalChars : 0,
+        starRating: stars,
+        streak: 0,
+      };
+
+      dispatch(setSessionElapsed(duration));
+      dispatch(endSessionAction(summary));
+      if (activeLesson?.lesson.id) {
+        dispatch(completeLesson({ lessonId: activeLesson.lesson.id, summary }));
+        addTypingSession({
+          lessonId: activeLesson.lesson.id,
+          lessonTitle: activeLesson.lesson.title,
+          trackId: activeLesson.track.id,
+          trackName: activeLesson.track.name,
+          summary,
+        });
+      }
+
+      if (endScore > highScore) {
+        setHighScore(endScore);
+      }
+
       if (gameRecorder) {
-        gameRecorder.updateScore(finalScore);
-        if (finalScore > highScore) {
-          setHighScore(finalScore);
-        }
+        gameRecorder.updateScore(endScore);
       }
       // 游戏完成后恢复光标
       setIsPlaying(false);
@@ -129,16 +323,58 @@ export function TypingGame({ onPlayingChange }: TypingGameProps) {
     errorChar,
     startTime,
     getDuration,
+    wpm,
+    accuracy,
+    duration,
+    stars,
+    dispatch,
+    activeLesson,
     onPlayingChange,
   ]);
 
-  // 键盘事件处理
-  useEffect(() => {
-    if (!isPlaying) return;
+  const startGame = useCallback(() => {
+    dispatch(resetSession());
+    dispatch(
+      startSession({
+        lessonId,
+        text: lessonText,
+        timestamp: Date.now(),
+      })
+    );
+    prevCorrectRef.current = 0;
+    prevErrorRef.current = 0;
+    prevDurationRef.current = 0;
+    resetTyping();
+    setIsPlaying(true);
+    onPlayingChange?.(true);
+    const recorder = integrateGameWithAutoRecorder("Typing Game", "typing-game");
+    setGameRecorder(recorder);
+  }, [dispatch, lessonId, lessonText, resetTyping, onPlayingChange]);
 
-    const handleKeyDown = (e: KeyboardEvent) => {
-      e.preventDefault();
-      const key = e.key;
+  const resetGame = useCallback(() => {
+    setIsPlaying(false);
+    onPlayingChange?.(false);
+    resetTyping();
+    dispatch(resetSession());
+    if (gameRecorder) {
+      const finalScore = calculateWPM() * 10 + calculateAccuracy();
+      gameRecorder.endGame(finalScore);
+    }
+  }, [dispatch, resetTyping, gameRecorder, onPlayingChange, calculateWPM, calculateAccuracy]);
+
+  const selectNewText = useCallback(() => {
+    const nextLessonId = recommendedLessonIds.find((id) => id !== lessonId) ?? lessonId;
+    dispatch(selectLesson({ lessonId: nextLessonId }));
+  }, [dispatch, recommendedLessonIds, lessonId]);
+
+  const handleKeyDown = useCallback(
+    (event: KeyboardEvent) => {
+      if (!isPlaying) return;
+
+      const key = event.key;
+      if (key.length === 1 || key === "Backspace" || key === "Escape") {
+        event.preventDefault();
+      }
 
       if (key === "Escape") {
         resetGame();
@@ -146,124 +382,288 @@ export function TypingGame({ onPlayingChange }: TypingGameProps) {
       }
 
       if (key === "Backspace") {
+        playKey();
         deleteTyping(false);
         return;
       }
 
       if (key.length === 1) {
+        playKey();
         insertTyping(key);
       }
-    };
+    },
+    [isPlaying, resetGame, deleteTyping, insertTyping, playKey]
+  );
 
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isPlaying, insertTyping, deleteTyping, resetGame]);
+  useEffect(() => {
+    if (!isPlaying) {
+      prevCorrectRef.current = correctChar;
+      prevErrorRef.current = errorChar;
+      prevDurationRef.current = duration;
+      return;
+    }
 
-  const wpm = calculateWPM();
-  const accuracy = calculateAccuracy();
-  const duration = getDuration();
+    const correctDiff = correctChar - prevCorrectRef.current;
+    const errorDiff = errorChar - prevErrorRef.current;
+    const deltaDuration = Math.max(0, duration - prevDurationRef.current);
+
+    if (correctDiff > 0) {
+      dispatch(recordKeystroke({ isCorrect: true, count: correctDiff }));
+    }
+    if (errorDiff > 0) {
+      dispatch(recordKeystroke({ isCorrect: false, count: errorDiff }));
+      playError();
+    }
+    if (deltaDuration > 0) {
+      dispatch(setSessionElapsed(duration));
+    }
+    dispatch(updateCursor(currIndex));
+
+    prevCorrectRef.current = correctChar;
+    prevErrorRef.current = errorChar;
+    prevDurationRef.current = duration;
+  }, [
+    isPlaying,
+    correctChar,
+    errorChar,
+    duration,
+    currIndex,
+    dispatch,
+    playError,
+  ]);
+
+  // 更新统计数据到父组件
+  useEffect(() => {
+    if (!onStatsUpdate) return;
+
+    onStatsUpdate({
+      wpm,
+      accuracy,
+      correctChars: correctChar,
+      errorChars: errorChar,
+      highScore,
+      durationMs: duration,
+      stars,
+      isCompleted: phase === PhaseType.Ended,
+    });
+  }, [
+    wpm,
+    accuracy,
+    correctChar,
+    errorChar,
+    highScore,
+    duration,
+    stars,
+    phase,
+    onStatsUpdate,
+  ]);
 
   return (
-    <Card className="w-full max-w-4xl mx-auto p-8 bg-gradient-to-br from-purple-900/50 via-blue-900/50 to-indigo-900/50 border-white/20 backdrop-blur-sm">
+    <>
+      <TypingSettingsPanel open={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
+      <Card
+        className={`w-full max-w-4xl mx-auto p-8 bg-gradient-to-br from-purple-900/50 via-blue-900/50 to-indigo-900/50 border-white/20 backdrop-blur-sm ${preferences.accessibility.highContrastMode ? "border-yellow-300/60" : ""}`}
+      >
       <div className="space-y-6">
         {/* Header */}
-        <div className="text-center">
-          <h2 className="text-4xl font-bold text-white mb-2">⌨️ Typing Game</h2>
-          <p className="text-white/70">Test your typing speed and accuracy!</p>
+        <div className="flex flex-col items-center gap-4 md:flex-row md:items-start md:justify-between">
+          <div className="text-center space-y-2 md:text-left">
+            <h2 className="text-4xl font-bold text-white">⌨️ Typing Game</h2>
+            <p className="text-white/70 text-base">
+              从基准键开始，逐步覆盖整块键盘。
+            </p>
+            <p className="text-sm text-white/50">当前课程：{lessonTitle}</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              className="border-white/20 text-white"
+              onClick={() => setIsSettingsOpen(true)}
+            >
+              ⚙️ 设置
+            </Button>
+            <Button asChild variant="outline" size="sm" className="border-white/20 text-white">
+              <Link href="/typing-analytics">统计</Link>
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="border-white/20 text-white"
+              onClick={selectNewText}
+            >
+              下一推荐
+            </Button>
+          </div>
+        </div>
+
+        <LessonSelector />
+
+        {/* Lesson Guide */}
+        <div className="relative overflow-hidden rounded-2xl border border-white/15 bg-white/5 p-6">
+          <div className="flex flex-wrap items-center gap-3">
+            <div>
+              <h3 className="text-lg font-semibold text-white">入门引导小方块</h3>
+              <p className="text-sm text-white/60">
+                先练一对按键，再向上、向下扩展；影子手指帮助你对齐键位。
+              </p>
+            </div>
+          </div>
+
+          <div className="absolute -top-10 -right-6 hidden lg:block text-white/10 text-[140px] leading-none select-none pointer-events-none">
+            🖐️
+          </div>
+
+          <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+            {KEY_GUIDES.map((guide) => (
+              <div
+                key={guide.id}
+                className="rounded-xl border border-white/10 bg-black/30 px-4 py-3 backdrop-blur-sm"
+              >
+                <div className="flex items-center justify-between text-xs text-white/60 uppercase tracking-wide">
+                  <span className="font-semibold text-white/90">{guide.title}</span>
+                  <span>{guide.finger}</span>
+                </div>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {guide.keys.map((key) => (
+                    <span
+                      key={key}
+                      className="inline-flex min-w-[42px] items-center justify-center rounded-md bg-white/15 px-2 py-1 text-sm font-semibold text-white/90"
+                    >
+                      {key}
+                    </span>
+                  ))}
+                </div>
+                <p className="mt-3 text-xs text-white/70 leading-relaxed">
+                  {guide.description}
+                </p>
+            </div>
+            ))}
+          </div>
+
+          <div className="mt-5 flex flex-wrap gap-2">
+            {SKILL_MILESTONES.map((milestone) => {
+              const unlocked = stars >= milestone.starsNeeded && stars > 0;
+              return (
+                <div
+                  key={milestone.id}
+                  className={`flex items-start gap-2 rounded-full border px-3 py-2 text-xs font-medium transition ${
+                    unlocked
+                      ? "border-yellow-300/60 bg-yellow-400/10 text-yellow-200"
+                      : "border-white/15 bg-white/5 text-white/60"
+                  }`}
+                >
+                  <span>{milestone.label}</span>
+                  <span className="text-white/40">·</span>
+                  <span className="max-w-[120px] leading-relaxed">
+                    {milestone.requirement}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="bg-white/10 rounded-lg p-4 text-center">
-            <div className="text-2xl font-bold text-green-400">{wpm}</div>
-            <div className="text-sm text-white/70">WPM</div>
-          </div>
-          <div className="bg-white/10 rounded-lg p-4 text-center">
-            <div className="text-2xl font-bold text-blue-400">{accuracy}%</div>
-            <div className="text-sm text-white/70">Accuracy</div>
-          </div>
-          <div className="bg-white/10 rounded-lg p-4 text-center">
-            <div className="text-2xl font-bold text-purple-400">
-              {correctChar}
-            </div>
-            <div className="text-sm text-white/70">Correct</div>
-          </div>
-          <div className="bg-white/10 rounded-lg p-4 text-center">
-            <div className="text-2xl font-bold text-red-400">{errorChar}</div>
-            <div className="text-sm text-white/70">Errors</div>
-          </div>
-        </div>
+        <StatsPanel
+          wpm={wpm}
+          accuracy={accuracy}
+          correct={correctChar}
+          mistakes={errorChar}
+          elapsedMs={duration}
+          stars={stars}
+        />
 
         {/* Typing Area */}
-        <div
-          className="bg-black/30 rounded-lg p-6 min-h-[200px] border border-white/10 focus-within:border-purple-400/50 transition-colors"
-          tabIndex={0}
-        >
+        <TypingController enabled={isPlaying} onKeyDown={handleKeyDown}>
+          <div className="bg-black/30 rounded-lg p-6 min-h-[220px] border border-white/10 focus-within:border-purple-400/50 transition-colors">
           {!isPlaying ? (
-            <div className="text-center py-12">
-              <p className="text-white/70 text-lg mb-4">
-                Click &quot;Start Game&quot; to begin typing!
-              </p>
+              <div className="flex min-h-[180px] flex-col items-center justify-center gap-6 text-center">
+                <div>
+                  <p className="text-white/80 text-lg font-medium">
+                    准备好开始盲打旅程了吗？
+                  </p>
+                  <p className="text-white/50 text-sm mt-2 max-w-xl">
+                    按照小方块的顺序：先练 J · F，再练 K · D、L · S、A · ;，最后补充 Shift 与 Enter。
+                    不看键盘，跟着节奏敲击。
+                  </p>
+                </div>
+                <div className="grid w-full grid-cols-1 gap-3 text-sm text-white/70 sm:grid-cols-2">
+                  <div className="rounded-lg border border-white/10 bg-white/5 px-3 py-2">
+                    1. 手指轻放在 <span className="font-semibold text-white">F</span> 与 <span className="font-semibold text-white">J</span>。
+                  </div>
+                  <div className="rounded-lg border border-white/10 bg-white/5 px-3 py-2">
+                    2. 食指向外探到 <span className="font-semibold text-white">K</span> / <span className="font-semibold text-white">D</span>，随时回到基准键。
+                  </div>
+                  <div className="rounded-lg border border-white/10 bg-white/5 px-3 py-2">
+                    3. 小指负责 <span className="font-semibold text-white">Shift</span> 与 <span className="font-semibold text-white">Enter</span>。
+                  </div>
+                  <div className="rounded-lg border border-white/10 bg-white/5 px-3 py-2">
+                    4. 获得 <span className="font-semibold text-yellow-300">4 ⭐</span> 即可进入下一阶段。
+                  </div>
+                </div>
               <Button
                 onClick={startGame}
                 className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white"
               >
-                Start Game
+                  开始练习
               </Button>
             </div>
           ) : (
-            <div className="text-xl leading-relaxed font-mono">
-              {chars.split("").map((char, index) => {
-                const state = charsState[index];
-                const color =
-                  state === CharStateType.Incomplete
-                    ? "text-white/50"
-                    : state === CharStateType.Correct
-                    ? "text-green-400"
-                    : "text-red-400 bg-red-400/20";
-
-                // 高亮当前字符
-                const isCurrentChar = index === currIndex;
-                const bgColor =
-                  isCurrentChar && phase === PhaseType.Started
-                    ? "bg-purple-500/30"
-                    : "";
-
-                return (
-                  <span
-                    key={char + index}
-                    className={`${color} ${bgColor} ${
-                      isCurrentChar ? "animate-pulse" : ""
-                    }`}
-                  >
-                    {char === " " ? "\u00A0" : char}
-                  </span>
-                );
-              })}
-            </div>
+              <TextDisplay text={chars} cursorIndex={currIndex} />
           )}
         </div>
+        </TypingController>
+
+        <VirtualKeyboard keyStates={keyboardStates} />
+        <VirtualHands
+          currentChar={chars[currIndex]}
+          visible={layoutPrefs.showVirtualHands}
+          transparency={layoutPrefs.handTransparency}
+          theme={layoutPrefs.virtualHandTheme}
+        />
 
         {/* Instructions */}
         {isPlaying && phase === PhaseType.Started && (
           <div className="text-center text-white/60 text-sm">
-            <p>Type the text above. Press ESC to reset.</p>
+            <p>
+              保持节奏：遇到错误按 <span className="rounded bg-white/10 px-1">Backspace</span>，需要暂停按 <span className="rounded bg-white/10 px-1">ESC</span>。
+            </p>
           </div>
         )}
 
         {/* Game Over */}
-        {phase === PhaseType.Ended && isPlaying && (
+        {phase === PhaseType.Ended && (
           <div className="text-center space-y-4">
-            <div className="bg-green-500/20 border border-green-500/50 rounded-lg p-6">
-              <h3 className="text-2xl font-bold text-green-400 mb-2">
-                Game Complete! 🎉
-              </h3>
-              <p className="text-white/90">
-                Your final score: {wpm * 10 + accuracy} points
+            <div className="rounded-2xl border border-white/15 bg-white/10 p-6 backdrop-blur-sm">
+              <div className="mb-3 flex justify-center gap-1 text-3xl">
+                {Array.from({ length: 5 }).map((_, index) => (
+                  <span
+                    key={index}
+                    className={
+                      index < stars
+                        ? "text-yellow-300 drop-shadow"
+                        : "text-white/15"
+                    }
+                  >
+                    ★
+                  </span>
+                ))}
+              </div>
+              <h3 className="text-2xl font-bold text-white">本轮结果</h3>
+              <p className="mt-2 text-sm text-white/80">
+                WPM: {wpm} · 准确率: {accuracy}% · 用时: {formatDuration(duration)}
               </p>
-              <p className="text-white/70 text-sm mt-2">
-                WPM: {wpm} | Accuracy: {accuracy}%
-              </p>
+              <p className="mt-1 text-sm text-white/60">总分：{wpm * 10 + accuracy}</p>
+              {stars >= 4 ? (
+                <p className="mt-3 text-sm text-green-300">
+                  🎉 获得 4 颗星，可以继续前往下一阶段的练习！
+                </p>
+              ) : (
+                <p className="mt-3 text-sm text-white/50">
+                  凑够 4 颗星即可解锁进阶模块，加油！
+                </p>
+              )}
             </div>
           </div>
         )}
@@ -276,16 +676,7 @@ export function TypingGame({ onPlayingChange }: TypingGameProps) {
               variant="outline"
               className="text-white border-white/30 hover:bg-white/10"
             >
-              Reset Game
-            </Button>
-          )}
-          {!isPlaying && (
-            <Button
-              onClick={selectNewText}
-              variant="outline"
-              className="text-white border-white/30 hover:bg-white/10"
-            >
-              New Text
+              结束本轮
             </Button>
           )}
         </div>
@@ -294,12 +685,48 @@ export function TypingGame({ onPlayingChange }: TypingGameProps) {
         {highScore > 0 && (
           <div className="text-center">
             <p className="text-white/70 text-sm">
-              High Score:{" "}
+              最高分：
               <span className="text-yellow-400 font-bold">{highScore}</span>
             </p>
           </div>
         )}
       </div>
     </Card>
+    </>
   );
+}
+
+function extractLessonText(content?: LessonContent) {
+  if (!content) return "";
+
+  const segments: string[] = [];
+
+  for (const lessonModule of content.modules) {
+    switch (lessonModule.type) {
+      case "drill": {
+        const repeated = Array(lessonModule.repetitions)
+          .fill(lessonModule.text)
+          .join(" ");
+        segments.push(repeated);
+        break;
+      }
+      case "exercise": {
+        const blockText = lessonModule.textBlocks.flat().join(" ");
+        segments.push(blockText);
+        break;
+      }
+      case "challenge": {
+        segments.push(
+          `${lessonModule.title ?? "挑战"}，目标 ${lessonModule.targetWPM} WPM，时长 ${lessonModule.durationSec} 秒`
+        );
+        break;
+      }
+      case "test": {
+        segments.push(lessonModule.questionPool.join(" "));
+        break;
+      }
+    }
+  }
+
+  return segments.join(" ").replace(/\s+/g, " ").trim();
 }
