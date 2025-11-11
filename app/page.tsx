@@ -9,6 +9,7 @@ import {
   useNetworkStatus,
 } from "@/components/ui/offline-detector";
 import { SimpleAnalytics } from "@/components/analytics/SimpleAnalytics";
+import { TypingAnimation } from "@/registry/magicui/typing-animation";
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -176,9 +177,13 @@ export default function Home() {
         <main className="flex flex-col gap-[32px] row-start-2 items-center relative z-10">
           <ProfilePhoto />
           <VideoTextDemo />
-          <p className="text-lg text-white/90 backdrop-blur-sm bg-white/10 rounded-2xl px-6 py-3 border border-white/20">
+          <TypingAnimation
+            className="text-lg text-white/90 backdrop-blur-sm bg-white/10 rounded-2xl px-6 py-3 border border-white/20"
+            speed={55}
+            hideCursorAfterFinish
+          >
             I&apos;m building my world.
-          </p>
+          </TypingAnimation>
           <div className="flex gap-4 flex-wrap justify-center">
             <Button
               onClick={handleClick}

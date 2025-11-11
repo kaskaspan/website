@@ -41,6 +41,7 @@ import { GameSidebar } from "@/components/ui/game-sidebar";
 import { useEffect, useState } from "react";
 import { IconCloud } from "@/components/ui/icon-cloud";
 import { SmoothCursor } from "@/registry/magicui/smooth-cursor";
+import { TypingAnimation } from "@/registry/magicui/typing-animation";
 
 export default function GamePage() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
@@ -172,13 +173,23 @@ export default function GamePage() {
             </div>
 
             <div className="text-center mb-8">
-              <h1 className="text-6xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent mb-4">
-                🎮 Game Zone
+              <h1 className="mb-4">
+                <TypingAnimation
+                  className="text-4xl sm:text-6xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent"
+                  speed={50}
+                  hideCursorAfterFinish
+                >
+                  🎮 Game Zone
+                </TypingAnimation>
               </h1>
               <div className="w-24 h-1 bg-gradient-to-r from-purple-500 to-blue-500 mx-auto mb-8" />
-              <p className="text-white/70 text-lg">
+              <TypingAnimation
+                className="block text-white/70 text-lg"
+                speed={45}
+                hideCursorAfterFinish
+              >
                 Welcome to the fun game section! Choose a game from the sidebar.
-              </p>
+              </TypingAnimation>
               <div className="mt-4 text-white/50 text-sm">
                 <span className="hidden md:block">Move your mouse around</span>
                 <span className="block md:hidden">

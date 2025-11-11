@@ -6,6 +6,7 @@ import { TypingGameSidebar } from "@/components/ui/typing-game-sidebar";
 import { TypingGameRightSidebar } from "@/components/ui/typing-game-right-sidebar";
 import { useState, useEffect, useCallback } from "react";
 import { SmoothCursor } from "@/registry/magicui/smooth-cursor";
+import { TypingAnimation } from "@/registry/magicui/typing-animation";
 import { Button } from "@/components/ui/button";
 import { LogIn, UserRound } from "lucide-react";
 
@@ -68,26 +69,35 @@ export default function TypingGamePage() {
   }) => {
     setGameStats((prev) => {
       const newHighScore = stats.highScore ?? prev.highScore;
-      const nextState = {
-        ...prev,
-        ...stats,
-        highScore: Math.max(prev.highScore, newHighScore),
-      };
+      const nextHighScore = Math.max(prev.highScore, newHighScore);
 
-      const hasChanged = Object.keys(nextState).some((key) => {
-        const typedKey = key as keyof typeof nextState;
-        return nextState[typedKey] !== prev[typedKey];
-      });
-
-      if (!hasChanged) {
+      if (
+        prev.wpm === stats.wpm &&
+        prev.accuracy === stats.accuracy &&
+        prev.correctChars === stats.correctChars &&
+        prev.errorChars === stats.errorChars &&
+        prev.durationMs === stats.durationMs &&
+        prev.stars === stats.stars &&
+        prev.isCompleted === stats.isCompleted &&
+        prev.highScore === nextHighScore
+      ) {
         return prev;
       }
 
-      if (nextState.highScore > prev.highScore && typeof window !== "undefined") {
-        localStorage.setItem("typingGameHighScore", nextState.highScore.toString());
+      if (nextHighScore > prev.highScore && typeof window !== "undefined") {
+        localStorage.setItem("typingGameHighScore", nextHighScore.toString());
       }
 
-      return nextState;
+      return {
+        wpm: stats.wpm,
+        accuracy: stats.accuracy,
+        correctChars: stats.correctChars,
+        errorChars: stats.errorChars,
+        highScore: nextHighScore,
+        durationMs: stats.durationMs,
+        stars: stats.stars,
+        isCompleted: stats.isCompleted,
+      };
     });
   }, []);
 
@@ -217,8 +227,13 @@ export default function TypingGamePage() {
             </div>
 
             <div className="text-center mb-8">
-              <h1 className="text-6xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent mb-4">
-                ⌨️ Typing Game
+              <h1 className="mb-4">
+                <TypingAnimation
+                  className="text-4xl sm:text-6xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent"
+                  hideCursorAfterFinish
+                >
+                  ⌨️ Typing Game
+                </TypingAnimation>
               </h1>
               <div className="w-24 h-1 bg-gradient-to-r from-purple-500 to-blue-500 mx-auto mb-8" />
               <p className="text-white/70 text-lg">

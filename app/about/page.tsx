@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { SimpleAnalytics } from "@/components/analytics/SimpleAnalytics";
+import { TypingAnimation } from "@/registry/magicui/typing-animation";
 
 export default function About() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
@@ -110,12 +111,20 @@ export default function About() {
           </div>
 
           <div className="text-lg space-y-6 text-white/90 backdrop-blur-sm bg-white/10 rounded-2xl p-8 border border-white/20">
-            <p className="text-xl font-semibold text-white">I am Kasper.</p>
-            <p className="leading-relaxed">
-              I am building my world, exploring the infinite possibilities of
-              technology and creativity. Every day brings new challenges and
-              opportunities to create something meaningful.
-            </p>
+            <TypingAnimation
+              className="block text-xl font-semibold text-white"
+              speed={60}
+              hideCursorAfterFinish
+            >
+              I am Kasper.
+            </TypingAnimation>
+            <TypingAnimation
+              className="block leading-relaxed text-white/90"
+              speed={45}
+              hideCursorAfterFinish
+            >
+              I am building my world, exploring the infinite possibilities of technology and creativity. Every day brings new challenges and opportunities to create something meaningful.
+            </TypingAnimation>
           </div>
 
           <div className="space-y-4 text-white/80">
