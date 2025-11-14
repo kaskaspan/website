@@ -5,6 +5,7 @@ import { OfflineDetector } from "@/components/ui/offline-detector";
 import { GoogleAnalytics } from "@/components/analytics/GoogleAnalytics";
 import { AuthProvider } from "@/components/auth/AuthProvider";
 import { StoreProvider } from "@/store/StoreProvider";
+import { VirtualInputPanel } from "@/components/ui/virtual-input-panel";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -37,6 +38,7 @@ export default function RootLayout({
             {/* Google Analytics - Replace with your Measurement ID */}
             <GoogleAnalytics measurementId="G-XXXXXXXXXX" />
             {children}
+            <VirtualInputPanel />
           </AuthProvider>
         </StoreProvider>
       </body>
