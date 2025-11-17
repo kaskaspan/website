@@ -152,24 +152,55 @@ export function GameSidebar({ currentGame, onGameSelect }: GameSidebarProps) {
 
   return (
     <Card
-      className={`h-full bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 border-white/20 transition-all duration-300 ${
+      className={`h-full bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 border-white/20 transition-all duration-300 relative z-50 ${
         isCollapsed ? "w-16" : "w-64"
       }`}
     >
-      <div className="p-4 h-full flex flex-col">
+      <div className={`h-full flex flex-col ${isCollapsed ? "p-2" : "p-4"}`}>
         {/* Header */}
-        <div className="flex items-center justify-between mb-4">
-          {!isCollapsed && (
-            <h2 className="text-xl font-bold text-white">🎮 Game Center</h2>
+        <div className={`flex flex-col items-center ${isCollapsed ? "mb-4" : "mb-4"}`}>
+          {isCollapsed ? (
+            <>
+              {/* Top Icon - Click to go to current game */}
+              <Button
+                onClick={() => {
+                  const currentGameData = GAMES.find((g) => g.id === currentGame);
+                  if (currentGameData) {
+                    onGameSelect(currentGame);
+                  }
+                }}
+                variant="ghost"
+                size="lg"
+                className="w-full h-12 mb-2 text-white hover:bg-white/20 rounded-lg transition-all"
+                title={GAMES.find((g) => g.id === currentGame)?.name || "Current Game"}
+              >
+                <span className="text-2xl">
+                  {GAMES.find((g) => g.id === currentGame)?.name.split(" ")[0] || "🎮"}
+                </span>
+              </Button>
+              {/* Collapse Button */}
+              <Button
+                onClick={() => setIsCollapsed(!isCollapsed)}
+                variant="ghost"
+                size="sm"
+                className="text-white hover:bg-white/10 w-full"
+              >
+                →
+              </Button>
+            </>
+          ) : (
+            <div className="flex items-center justify-between w-full">
+              <h2 className="text-xl font-bold text-white">🎮 Game Center</h2>
+              <Button
+                onClick={() => setIsCollapsed(!isCollapsed)}
+                variant="ghost"
+                size="sm"
+                className="text-white hover:bg-white/10"
+              >
+                ←
+              </Button>
+            </div>
           )}
-          <Button
-            onClick={() => setIsCollapsed(!isCollapsed)}
-            variant="ghost"
-            size="sm"
-            className="text-white hover:bg-white/10"
-          >
-            {isCollapsed ? "→" : "←"}
-          </Button>
         </div>
 
         {/* Divider */}
@@ -178,18 +209,22 @@ export function GameSidebar({ currentGame, onGameSelect }: GameSidebarProps) {
         )}
 
         {/* Game List */}
-        <div className="space-y-2 flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent">
+        <div className={`flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent ${isCollapsed ? "space-y-2" : "space-y-2"}`}>
           {GAMES.map((game) => (
             <Button
               key={game.id}
               onClick={() => onGameSelect(game.id)}
-              className={`w-full justify-start text-left h-auto p-3 transition-all duration-200 ${
+              className={`w-full h-auto transition-all duration-200 ${
+                isCollapsed 
+                  ? "justify-center p-2" 
+                  : "justify-start text-left p-3"
+              } ${
                 currentGame === game.id
                   ? "bg-purple-600 text-white shadow-lg"
                   : "bg-white/10 text-white hover:bg-white/20"
               }`}
             >
-              <div className="flex items-center space-x-3">
+              <div className={`flex items-center ${isCollapsed ? "justify-center" : "space-x-3"}`}>
                 <span className="text-lg">{game.name.split(" ")[0]}</span>
                 {!isCollapsed && (
                   <div className="flex-1">

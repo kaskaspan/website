@@ -38,14 +38,61 @@ import { CrossyRoadGame } from "@/components/ui/crossy-road-game";
 import { BallGame } from "@/components/ui/ball-game";
 import { SlitherGame } from "@/components/ui/slither-game";
 import { GameSidebar } from "@/components/ui/game-sidebar";
+
+// 游戏列表（与 GameSidebar 中的保持一致）
+const GAMES = [
+  { id: "snake", name: "🐍 Snake" },
+  { id: "tetris", name: "🧩 Tetris" },
+  { id: "pong", name: "🏓 Pong" },
+  { id: "breakout", name: "💥 Breakout" },
+  { id: "minesweeper", name: "💣 Minesweeper" },
+  { id: "memory", name: "🧠 Memory" },
+  { id: "2048", name: "🔢 2048" },
+  { id: "space-invaders", name: "🚀 Space Invaders" },
+  { id: "chess", name: "♟️ Chess" },
+  { id: "colorful-tetris", name: "🌈 Colorful Tetris" },
+  { id: "advanced-minesweeper", name: "💣 Advanced Minesweeper" },
+  { id: "multiplayer-snake", name: "🐍🐍 Multiplayer Snake" },
+  { id: "tic-tac-toe", name: "⭕❌ Tic Tac Toe" },
+  { id: "puzzle", name: "🧩 Puzzle" },
+  { id: "space-shooter", name: "🚀 Space Shooter" },
+  { id: "racing", name: "🏎️ Racing" },
+  { id: "platformer", name: "🦘 Platformer" },
+  { id: "word-puzzle", name: "📝 Word Puzzle" },
+  { id: "card-game", name: "🃏 Card Game" },
+  { id: "dungeon-crawler", name: "🗡️ Dungeon Crawler" },
+  { id: "rhythm-game", name: "🎵 Rhythm Game" },
+  { id: "tower-defense", name: "🏰 Tower Defense" },
+  { id: "frogger", name: "🐸 Frogger" },
+  { id: "asteroids", name: "🪨 Asteroids" },
+  { id: "connect-four", name: "🔴🟡 Connect Four" },
+  { id: "solitaire", name: "🃏 Solitaire" },
+  { id: "mahjong", name: "🀄 Mahjong" },
+  { id: "bubble-shooter", name: "🫧 Bubble Shooter" },
+  { id: "roguelike", name: "⚔️ Roguelike" },
+  { id: "match-three", name: "💎 Match Three" },
+  { id: "flappy-bird", name: "🐦 Flappy Bird" },
+  { id: "doodle-jump", name: "🦘 Doodle Jump" },
+  { id: "color-switch", name: "🎨 Color Switch" },
+  { id: "crossy-road", name: "🐔 Crossy Road" },
+  { id: "ball-game", name: "⚽ Ball Game" },
+  { id: "slither", name: "🐍 Slither" },
+];
 import { useEffect, useState } from "react";
 import { IconCloud } from "@/components/ui/icon-cloud";
 import { SmoothCursor } from "@/registry/magicui/smooth-cursor";
 import { TypingAnimation } from "@/registry/magicui/typing-animation";
+import {
+  VirtualKeyboardToggleButton,
+  useVirtualKeyboard,
+} from "@/components/ui/virtual-keyboard-toggle";
+import { Menu, X } from "lucide-react";
 
 export default function GamePage() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [currentGame, setCurrentGame] = useState("snake");
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  const { isOpen: isKeyboardOpen } = useVirtualKeyboard();
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -59,7 +106,10 @@ export default function GamePage() {
   }, []);
 
   return (
-    <div className="font-sans relative min-h-screen overflow-hidden">
+    <div
+      className="font-sans relative min-h-screen overflow-y-auto overflow-x-hidden"
+      style={{ minHeight: "100dvh" }}
+    >
       {/* Animated Background */}
       <div className="absolute inset-0 bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
         {/* Floating orbs */}
@@ -141,17 +191,68 @@ export default function GamePage() {
 
       {/* Content */}
       <div className="relative z-10 min-h-screen flex">
-        {/* Sidebar */}
-        <div className="hidden lg:block">
+        {/* Desktop Sidebar */}
+        <div className="hidden lg:block relative z-50">
           <GameSidebar
             currentGame={currentGame}
             onGameSelect={setCurrentGame}
           />
         </div>
 
+        {/* Mobile Sidebar Overlay */}
+        {isMobileSidebarOpen && (
+          <div
+            className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+            onClick={() => setIsMobileSidebarOpen(false)}
+          />
+        )}
+
+        {/* Mobile Sidebar */}
+        <div
+          className={`
+            fixed left-0 top-0 h-full w-64 z-50 transform transition-transform duration-300 ease-in-out lg:hidden
+            ${isMobileSidebarOpen ? "translate-x-0" : "-translate-x-full"}
+          `}
+        >
+          <div className="h-full bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 border-r border-white/20 p-4 overflow-y-auto">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-bold text-white">🎮 Game Center</h2>
+              <button
+                onClick={() => setIsMobileSidebarOpen(false)}
+                className="text-white hover:bg-white/10 p-2 rounded"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <GameSidebar
+              currentGame={currentGame}
+              onGameSelect={(game) => {
+                setCurrentGame(game);
+                setIsMobileSidebarOpen(false);
+              }}
+            />
+          </div>
+        </div>
+
         {/* Main Content */}
-        <div className="flex-1 p-8 pb-20 gap-16 sm:p-20">
+        <div
+          className="flex-1 p-8 gap-16 sm:p-20"
+          style={{
+            paddingBottom: isKeyboardOpen ? "calc(25vh + 2rem)" : "5rem",
+            transition: "padding-bottom 0.3s ease-out",
+          }}
+        >
           <main className="max-w-4xl mx-auto">
+            {/* Mobile Menu Button */}
+            <div className="lg:hidden mb-4 flex items-center justify-between">
+              <button
+                onClick={() => setIsMobileSidebarOpen(true)}
+                className="p-2 bg-white/10 hover:bg-white/20 rounded-lg text-white transition-colors"
+              >
+                <Menu className="h-6 w-6" />
+              </button>
+              <VirtualKeyboardToggleButton />
+            </div>
             {/* Game Emoji Cloud */}
             <div className="mb-8 h-32 w-full">
               <IconCloud
@@ -182,6 +283,43 @@ export default function GamePage() {
                   🎮 Game Zone
                 </TypingAnimation>
               </h1>
+
+              {/* Top Game Icon - Clickable */}
+              <div className="flex items-center justify-center gap-4 mb-4">
+                <button
+                  onClick={() => {
+                    // 滚动到游戏区域
+                    setTimeout(() => {
+                      const gameContainer = document.querySelector(
+                        "[data-game-container]"
+                      );
+                      if (gameContainer) {
+                        gameContainer.scrollIntoView({
+                          behavior: "smooth",
+                          block: "start",
+                        });
+                      }
+                    }, 50);
+                  }}
+                  className="p-3 bg-white/10 hover:bg-white/20 rounded-full border border-white/20 hover:border-white/40 transition-all transform hover:scale-110 active:scale-95 cursor-pointer shadow-lg"
+                  title={`当前游戏: ${
+                    GAMES.find((g) => g.id === currentGame)?.name || currentGame
+                  } - 点击跳转到游戏区域`}
+                >
+                  <span className="text-3xl">
+                    {GAMES.find((g) => g.id === currentGame)?.name.split(
+                      " "
+                    )[0] || "🎮"}
+                  </span>
+                </button>
+                <div className="hidden lg:flex">
+                  <VirtualKeyboardToggleButton />
+                </div>
+              </div>
+
+              <div className="lg:hidden flex justify-center mb-4">
+                <VirtualKeyboardToggleButton />
+              </div>
               <div className="w-24 h-1 bg-gradient-to-r from-purple-500 to-blue-500 mx-auto mb-8" />
               <TypingAnimation
                 className="block text-white/70 text-lg"
@@ -200,7 +338,7 @@ export default function GamePage() {
             </div>
 
             {/* Game Content */}
-            <div className="min-h-[600px]">
+            <div className="min-h-[600px]" data-game-container>
               {currentGame === "snake" && <SnakeGame />}
               {currentGame === "tetris" && <TetrisGame />}
               {currentGame === "pong" && <PongGame />}

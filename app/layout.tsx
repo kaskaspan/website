@@ -6,6 +6,7 @@ import { GoogleAnalytics } from "@/components/analytics/GoogleAnalytics";
 import { AuthProvider } from "@/components/auth/AuthProvider";
 import { StoreProvider } from "@/store/StoreProvider";
 import { VirtualInputPanel } from "@/components/ui/virtual-input-panel";
+import { VirtualKeyboardProvider } from "@/components/ui/virtual-keyboard-toggle";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -34,11 +35,13 @@ export default function RootLayout({
       >
         <StoreProvider>
           <AuthProvider>
-            <OfflineDetector />
-            {/* Google Analytics - Replace with your Measurement ID */}
-            <GoogleAnalytics measurementId="G-XXXXXXXXXX" />
-            {children}
-            <VirtualInputPanel />
+            <VirtualKeyboardProvider>
+              <OfflineDetector />
+              {/* Google Analytics - Replace with your Measurement ID */}
+              <GoogleAnalytics measurementId="G-XXXXXXXXXX" />
+              {children}
+              <VirtualInputPanel />
+            </VirtualKeyboardProvider>
           </AuthProvider>
         </StoreProvider>
       </body>

@@ -4,16 +4,29 @@ import Link from "next/link";
 import { TypingGame } from "@/components/ui/typing-game";
 import { TypingGameSidebar } from "@/components/ui/typing-game-sidebar";
 import { TypingGameRightSidebar } from "@/components/ui/typing-game-right-sidebar";
+
+// 打字模式列表
+const TYPING_MODES = [
+  { id: "classic", name: "📝 经典模式" },
+  { id: "speed", name: "⚡ 速度挑战" },
+  { id: "accuracy", name: "🎯 准确度训练" },
+  { id: "code", name: "💻 代码练习" },
+  { id: "quote", name: "💬 名言警句" },
+  { id: "custom", name: "✏️ 自定义文本" },
+];
 import { useState, useEffect, useCallback } from "react";
 import { SmoothCursor } from "@/registry/magicui/smooth-cursor";
 import { TypingAnimation } from "@/registry/magicui/typing-animation";
 import { Button } from "@/components/ui/button";
-import { LogIn, UserRound } from "lucide-react";
+import { LogIn, UserRound, Menu, X } from "lucide-react";
+import { VirtualKeyboardToggleButton, useVirtualKeyboard } from "@/components/ui/virtual-keyboard-toggle";
 
 export default function TypingGamePage() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [isGamePlaying, setIsGamePlaying] = useState(false);
   const [currentMode, setCurrentMode] = useState("classic");
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  const { isOpen: isKeyboardOpen } = useVirtualKeyboard();
   const [gameStats, setGameStats] = useState({
     wpm: 0,
     accuracy: 100,
@@ -102,7 +115,7 @@ export default function TypingGamePage() {
   }, []);
 
   return (
-    <div className="font-sans relative min-h-screen overflow-hidden">
+    <div className="font-sans relative min-h-screen overflow-y-auto overflow-x-hidden" style={{ minHeight: '100dvh' }}>
       {/* Animated Background */}
       <div className="absolute inset-0 bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
         {/* Floating orbs */}
@@ -183,17 +196,68 @@ export default function TypingGamePage() {
 
       {/* Content */}
       <div className="relative z-10 min-h-screen flex">
-        {/* Left Sidebar */}
-        <div className="hidden lg:block">
+        {/* Desktop Left Sidebar */}
+        <div className="hidden lg:block relative z-50">
           <TypingGameSidebar
             currentMode={currentMode}
             onModeSelect={setCurrentMode}
           />
         </div>
 
+        {/* Mobile Sidebar Overlay */}
+        {isMobileSidebarOpen && (
+          <div
+            className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+            onClick={() => setIsMobileSidebarOpen(false)}
+          />
+        )}
+
+        {/* Mobile Left Sidebar */}
+        <div
+          className={`
+            fixed left-0 top-0 h-full w-64 z-50 transform transition-transform duration-300 ease-in-out lg:hidden
+            ${isMobileSidebarOpen ? "translate-x-0" : "-translate-x-full"}
+          `}
+        >
+          <div className="h-full bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 border-r border-white/20 p-4 overflow-y-auto">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-bold text-white">⌨️ 打字模式</h2>
+              <button
+                onClick={() => setIsMobileSidebarOpen(false)}
+                className="text-white hover:bg-white/10 p-2 rounded"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <TypingGameSidebar
+              currentMode={currentMode}
+              onModeSelect={(mode) => {
+                setCurrentMode(mode);
+                setIsMobileSidebarOpen(false);
+              }}
+            />
+          </div>
+        </div>
+
         {/* Main Content */}
-        <div className="flex-1 p-8 pb-20 gap-16 sm:p-20">
+        <div 
+          className="flex-1 p-8 gap-16 sm:p-20"
+          style={{
+            paddingBottom: isKeyboardOpen ? 'calc(25vh + 2rem)' : '5rem',
+            transition: 'padding-bottom 0.3s ease-out',
+          }}
+        >
           <main className="max-w-4xl mx-auto">
+            {/* Mobile Menu Button */}
+            <div className="lg:hidden mb-4 flex items-center justify-between">
+              <button
+                onClick={() => setIsMobileSidebarOpen(true)}
+                className="p-2 bg-white/10 hover:bg-white/20 rounded-lg text-white transition-colors"
+              >
+                <Menu className="h-6 w-6" />
+              </button>
+              <VirtualKeyboardToggleButton />
+            </div>
             <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
               <div className="flex items-center gap-3 text-white/70 text-sm">
                 <Link
@@ -235,6 +299,34 @@ export default function TypingGamePage() {
                   ⌨️ Typing Game
                 </TypingAnimation>
               </h1>
+              
+              {/* Top Mode Icon - Clickable */}
+              <div className="flex items-center justify-center gap-4 mb-4">
+                <button
+                  onClick={() => {
+                    // 滚动到打字游戏区域
+                    setTimeout(() => {
+                      const gameContainer = document.querySelector('[data-typing-game-container]');
+                      if (gameContainer) {
+                        gameContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                      }
+                    }, 50);
+                  }}
+                  className="p-3 bg-white/10 hover:bg-white/20 rounded-full border border-white/20 hover:border-white/40 transition-all transform hover:scale-110 active:scale-95 cursor-pointer shadow-lg"
+                  title={`当前模式: ${TYPING_MODES.find((m) => m.id === currentMode)?.name || currentMode} - 点击跳转到游戏区域`}
+                >
+                  <span className="text-3xl">
+                    {TYPING_MODES.find((m) => m.id === currentMode)?.name.split(" ")[0] || "⌨️"}
+                  </span>
+                </button>
+                <div className="hidden lg:flex">
+                  <VirtualKeyboardToggleButton />
+                </div>
+              </div>
+              
+              <div className="lg:hidden flex justify-center mb-4">
+                <VirtualKeyboardToggleButton />
+              </div>
               <div className="w-24 h-1 bg-gradient-to-r from-purple-500 to-blue-500 mx-auto mb-8" />
               <p className="text-white/70 text-lg">
                 Improve your typing speed and accuracy
@@ -243,10 +335,12 @@ export default function TypingGamePage() {
             </div>
 
             {/* Game Component */}
-            <TypingGame
-              onPlayingChange={setIsGamePlaying}
-              onStatsUpdate={handleStatsUpdate}
-            />
+            <div data-typing-game-container>
+              <TypingGame
+                onPlayingChange={setIsGamePlaying}
+                onStatsUpdate={handleStatsUpdate}
+              />
+            </div>
 
             {/* Back Button */}
             <div className="mt-12 pt-8 border-t border-white/20 text-center">
@@ -264,7 +358,7 @@ export default function TypingGamePage() {
         </div>
 
         {/* Right Sidebar */}
-        <div className="hidden xl:block">
+        <div className="hidden xl:block relative z-50">
           <TypingGameRightSidebar
             wpm={gameStats.wpm}
             accuracy={gameStats.accuracy}

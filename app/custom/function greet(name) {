@@ -1,0 +1,6 @@
+function greet(name) {
+    return `Hello, ${name} tt`;
+}
+greet("Kasper")
+
+

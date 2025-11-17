@@ -187,4 +187,40 @@
     -webkit-overflow-scrolling: touch;
     overscroll-behavior: none;
   }
+
+  /* 虚拟键盘打开时的页面适配 */
+  @supports (height: 100dvh) {
+    html {
+      height: 100dvh;
+      height: -webkit-fill-available;
+    }
+    
+    body {
+      min-height: 100dvh;
+      min-height: -webkit-fill-available;
+    }
+  }
+
+  /* 确保页面内容可以滚动 */
+  .virtual-keyboard-open {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  /* 移动端视口单位支持 */
+  @media (max-width: 768px) {
+    html {
+      /* 使用动态视口高度，自动适应虚拟键盘 */
+      height: 100dvh;
+      height: -webkit-fill-available;
+    }
+    
+    body {
+      /* 允许内容滚动 */
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      /* 使用动态视口高度 */
+      min-height: 100dvh;
+      min-height: -webkit-fill-available;
+    }
+  }
 }

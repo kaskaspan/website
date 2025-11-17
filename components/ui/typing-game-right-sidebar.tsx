@@ -82,7 +82,7 @@ export function TypingGameRightSidebar({
 
   return (
     <Card
-      className={`h-full bg-gradient-to-br from-indigo-900 via-blue-900 to-purple-900 border-white/20 transition-all duration-300 ${
+      className={`h-full bg-gradient-to-br from-indigo-900 via-blue-900 to-purple-900 border-white/20 transition-all duration-300 relative z-50 ${
         isCollapsed ? "w-16" : "w-80"
       }`}
     >
