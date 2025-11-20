@@ -34,17 +34,13 @@ export function SupabaseLoginForm() {
         }
         result = await signUp(email, password, username);
       } else {
-        // 尝试邮箱登录
-        if (email && password) {
-          result = await loginWithEmail(email, password);
-        } else if (username) {
-          // 兼容旧的用户名登录（仅开发环境）
-          result = await loginWithUsername(username);
-        } else {
-          setError("请输入邮箱和密码，或用户名");
+        // 使用邮箱和密码登录
+        if (!email || !password) {
+          setError("请输入邮箱和密码");
           setIsLoading(false);
           return;
         }
+        result = await loginWithEmail(email, password);
       }
 
       if (result.success) {
@@ -105,7 +101,7 @@ export function SupabaseLoginForm() {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="your@email.com"
               className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
-              required={isSignUp || !username}
+              required
             />
           </div>
 
@@ -120,27 +116,10 @@ export function SupabaseLoginForm() {
               onChange={(e) => setPassword(e.target.value)}
               placeholder={isSignUp ? "至少6个字符" : "输入密码"}
               className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
-              required={isSignUp || !username}
+              required
               minLength={isSignUp ? 6 : undefined}
             />
           </div>
-
-          {!isSignUp && (
-            <div className="space-y-2">
-              <Label htmlFor="username-legacy" className="text-white text-sm">
-                或使用用户名登录（仅开发环境）
-              </Label>
-              <Input
-                id="username-legacy"
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                placeholder="输入用户名"
-                className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
-                disabled={!!email || !!password}
-              />
-            </div>
-          )}
 
           {error && (
             <div className="p-3 bg-red-500/20 border border-red-500/30 rounded-md">

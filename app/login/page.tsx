@@ -1,7 +1,7 @@
 "use client";
 
-import { LoginForm } from "@/components/auth/LoginForm";
+import { SupabaseLoginForm } from "@/components/auth/SupabaseLoginForm";
 
 export default function LoginPage() {
-  return <LoginForm />;
+  return <SupabaseLoginForm />;
 }
