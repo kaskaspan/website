@@ -39,6 +39,11 @@ export async function loginWithEmail(email: string, password: string) {
 export async function signUp(email: string, password: string, username: string) {
   const supabase = createClient()
   
+  // 获取当前 URL 用于重定向
+  const redirectTo = typeof window !== 'undefined' 
+    ? `${window.location.origin}/auth/callback?next=/login`
+    : undefined
+  
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
@@ -46,6 +51,7 @@ export async function signUp(email: string, password: string, username: string) 
       data: {
         username,
       },
+      emailRedirectTo: redirectTo,
     },
   })
 

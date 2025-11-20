@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -8,6 +8,7 @@ import { Card } from "@/components/ui/card";
 import { loginWithEmail, signUp, loginWithUsername } from "@/lib/supabase/auth";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { Eye, EyeOff } from "lucide-react";
 
 export function SupabaseLoginForm() {
   const [email, setEmail] = useState("");
@@ -16,12 +17,42 @@ export function SupabaseLoginForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [isSignUp, setIsSignUp] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
+
+  // 检查 URL 参数中是否有验证成功的消息
+  useEffect(() => {
+    const verified = new URLSearchParams(window.location.search).get('verified');
+    if (verified === 'true') {
+      setSuccessMessage('邮箱验证成功！您现在可以登录了。');
+      // 清除 URL 参数
+      window.history.replaceState({}, '', window.location.pathname);
+    }
+  }, []);
+
+  // 验证密码强度
+  const validatePassword = (pwd: string): { valid: boolean; message: string } => {
+    if (pwd.length < 6) {
+      return { valid: false, message: "密码至少需要 6 个字符" };
+    }
+    if (!/[0-9]/.test(pwd)) {
+      return { valid: false, message: "密码必须包含至少一个数字" };
+    }
+    if (!/[a-z]/.test(pwd)) {
+      return { valid: false, message: "密码必须包含至少一个小写字母" };
+    }
+    if (!/[A-Z]/.test(pwd)) {
+      return { valid: false, message: "密码必须包含至少一个大写字母" };
+    }
+    return { valid: true, message: "" };
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError("");
+    setSuccessMessage("");
 
     try {
       let result;
@@ -32,7 +63,41 @@ export function SupabaseLoginForm() {
           setIsLoading(false);
           return;
         }
+        
+        // 验证密码强度
+        const passwordValidation = validatePassword(password);
+        if (!passwordValidation.valid) {
+          setError(passwordValidation.message);
+          setIsLoading(false);
+          return;
+        }
+        
         result = await signUp(email, password, username);
+        
+        if (result.success) {
+          // 注册成功，显示成功消息，不自动跳转
+          setSuccessMessage("注册成功！请检查您的邮箱以验证账户。验证后即可登录。");
+          // 清空表单
+          setEmail("");
+          setPassword("");
+          setUsername("");
+          // 3秒后切换到登录模式
+          setTimeout(() => {
+            setIsSignUp(false);
+            setSuccessMessage("");
+          }, 5000);
+        } else {
+          // 提供更友好的错误消息
+          let errorMessage = result.message;
+          if (errorMessage.includes('invalid') || errorMessage.includes('Email')) {
+            errorMessage = '邮箱地址格式不正确，请检查拼写（例如：gmail.com 不是 gamil.com）';
+          } else if (errorMessage.includes('already registered') || errorMessage.includes('already exists')) {
+            errorMessage = '该邮箱已被注册，请直接登录或使用其他邮箱';
+          } else if (errorMessage.includes('password')) {
+            errorMessage = '密码不符合要求：需要至少6个字符，包含数字、大写和小写字母';
+          }
+          setError(errorMessage);
+        }
       } else {
         // 使用邮箱和密码登录
         if (!email || !password) {
@@ -41,13 +106,20 @@ export function SupabaseLoginForm() {
           return;
         }
         result = await loginWithEmail(email, password);
-      }
-
-      if (result.success) {
-        router.push("/");
-        router.refresh();
-      } else {
-        setError(result.message);
+        
+        if (result.success) {
+          router.push("/");
+          router.refresh();
+        } else {
+          // 提供更友好的错误消息
+          let errorMessage = result.message;
+          if (errorMessage.includes('Invalid login credentials') || errorMessage.includes('invalid')) {
+            errorMessage = '邮箱或密码错误，请检查后重试';
+          } else if (errorMessage.includes('Email not confirmed')) {
+            errorMessage = '请先验证您的邮箱。检查收件箱中的验证邮件。';
+          }
+          setError(errorMessage);
+        }
       }
     } catch (err: any) {
       setError(err.message || "发生错误，请重试");
@@ -109,21 +181,57 @@ export function SupabaseLoginForm() {
             <Label htmlFor="password" className="text-white">
               密码
             </Label>
-            <Input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder={isSignUp ? "至少6个字符" : "输入密码"}
-              className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
-              required
-              minLength={isSignUp ? 6 : undefined}
-            />
+            <div className="relative">
+              <Input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder={isSignUp ? "至少6个字符，包含数字、大写和小写字母" : "输入密码"}
+                className="bg-white/10 border-white/20 text-white placeholder:text-white/50 pr-10"
+                required
+                minLength={isSignUp ? 6 : undefined}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-white/60 hover:text-white transition-colors"
+                aria-label={showPassword ? "隐藏密码" : "显示密码"}
+              >
+                {showPassword ? (
+                  <EyeOff className="h-4 w-4" />
+                ) : (
+                  <Eye className="h-4 w-4" />
+                )}
+              </button>
+            </div>
+            {isSignUp && password && (
+              <div className="text-xs text-white/60 space-y-1">
+                <div className={password.length >= 6 ? "text-green-400" : ""}>
+                  {password.length >= 6 ? "✓" : "○"} 至少 6 个字符
+                </div>
+                <div className={/[0-9]/.test(password) ? "text-green-400" : ""}>
+                  {/[0-9]/.test(password) ? "✓" : "○"} 包含数字
+                </div>
+                <div className={/[a-z]/.test(password) ? "text-green-400" : ""}>
+                  {/[a-z]/.test(password) ? "✓" : "○"} 包含小写字母
+                </div>
+                <div className={/[A-Z]/.test(password) ? "text-green-400" : ""}>
+                  {/[A-Z]/.test(password) ? "✓" : "○"} 包含大写字母
+                </div>
+              </div>
+            )}
           </div>
 
           {error && (
             <div className="p-3 bg-red-500/20 border border-red-500/30 rounded-md">
               <p className="text-red-200 text-sm">{error}</p>
+            </div>
+          )}
+
+          {successMessage && (
+            <div className="p-3 bg-green-500/20 border border-green-500/30 rounded-md">
+              <p className="text-green-200 text-sm">{successMessage}</p>
             </div>
           )}
 
