@@ -1,22 +1,9 @@
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
+import { type NextRequest } from "next/server";
+import { updateSession } from "@/lib/supabase/middleware";
 
-export function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
-
-  // Allow access to login page, static files, and API routes
-  if (
-    pathname === "/login" ||
-    pathname.startsWith("/_next") ||
-    pathname.startsWith("/static") ||
-    pathname.startsWith("/api") ||
-    pathname === "/favicon.ico"
-  ) {
-    return NextResponse.next();
-  }
-
-  // For all other routes, let the client-side authentication handle the redirect
-  return NextResponse.next();
+export async function middleware(request: NextRequest) {
+  // Update Supabase session
+  return await updateSession(request);
 }
 
 export const config = {

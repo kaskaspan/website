@@ -20,6 +20,7 @@ import { TypingAnimation } from "@/registry/magicui/typing-animation";
 import { Button } from "@/components/ui/button";
 import { LogIn, UserRound, Menu, X } from "lucide-react";
 import { VirtualKeyboardToggleButton, useVirtualKeyboard } from "@/components/ui/virtual-keyboard-toggle";
+import { useAuth } from "@/components/auth/AuthProvider";
 
 export default function TypingGamePage() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
@@ -27,6 +28,7 @@ export default function TypingGamePage() {
   const [currentMode, setCurrentMode] = useState("classic");
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const { isOpen: isKeyboardOpen } = useVirtualKeyboard();
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
   const [gameStats, setGameStats] = useState({
     wpm: 0,
     accuracy: 100,
@@ -115,7 +117,7 @@ export default function TypingGamePage() {
   }, []);
 
   return (
-    <div className="font-sans relative min-h-screen overflow-y-auto overflow-x-hidden" style={{ minHeight: '100dvh' }}>
+    <div className="font-sans relative min-h-screen w-full overflow-y-auto overflow-x-hidden" style={{ minHeight: '100dvh' }}>
       {/* Animated Background */}
       <div className="absolute inset-0 bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
         {/* Floating orbs */}
@@ -195,7 +197,7 @@ export default function TypingGamePage() {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 min-h-screen flex">
+      <div className="relative z-10 min-h-screen w-full flex">
         {/* Desktop Left Sidebar */}
         <div className="hidden lg:block relative z-50">
           <TypingGameSidebar
@@ -241,13 +243,13 @@ export default function TypingGamePage() {
 
         {/* Main Content */}
         <div 
-          className="flex-1 p-8 gap-16 sm:p-20"
+          className="flex-1 w-full p-4 sm:p-6 md:p-8 lg:p-12 gap-16"
           style={{
             paddingBottom: isKeyboardOpen ? 'calc(25vh + 2rem)' : '5rem',
             transition: 'padding-bottom 0.3s ease-out',
           }}
         >
-          <main className="max-w-4xl mx-auto">
+          <main className="w-full">
             {/* Mobile Menu Button */}
             <div className="lg:hidden mb-4 flex items-center justify-between">
               <button
@@ -271,29 +273,36 @@ export default function TypingGamePage() {
               </div>
 
               <div className="flex items-center gap-3">
-                <Button asChild variant="ghost" className="text-white/80 hover:text-white">
-                  <Link href="/login" className="flex items-center gap-2">
-                    <LogIn className="h-4 w-4" />
-                    登录
-                  </Link>
-                </Button>
-                <Button
-                  asChild
-                  variant="outline"
-                  className="border-white/30 text-white/90 hover:bg-white/10"
-                >
-                  <Link href="/profile" className="flex items-center gap-2">
-                    <UserRound className="h-4 w-4" />
-                    个人资料
-                  </Link>
-                </Button>
+                {!authLoading && (
+                  <>
+                    {isAuthenticated ? (
+                      <Button
+                        asChild
+                        variant="outline"
+                        className="border-white/30 text-white/90 hover:bg-white/10"
+                      >
+                        <Link href="/profile" className="flex items-center gap-2">
+                          <UserRound className="h-4 w-4" />
+                          <span className="hidden sm:inline">个人资料</span>
+                        </Link>
+                      </Button>
+                    ) : (
+                      <Button asChild variant="ghost" className="text-white/80 hover:text-white">
+                        <Link href="/login" className="flex items-center gap-2">
+                          <LogIn className="h-4 w-4" />
+                          <span className="hidden sm:inline">登录</span>
+                        </Link>
+                      </Button>
+                    )}
+                  </>
+                )}
               </div>
             </div>
 
-            <div className="text-center mb-8">
-              <h1 className="mb-4">
+            <div className="text-center mb-6 sm:mb-8">
+              <h1 className="mb-3 sm:mb-4">
                 <TypingAnimation
-                  className="text-4xl sm:text-6xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent"
+                  className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent"
                   hideCursorAfterFinish
                 >
                   ⌨️ Typing Game
@@ -301,7 +310,7 @@ export default function TypingGamePage() {
               </h1>
               
               {/* Top Mode Icon - Clickable */}
-              <div className="flex items-center justify-center gap-4 mb-4">
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-4">
                 <button
                   onClick={() => {
                     // 滚动到打字游戏区域
@@ -312,20 +321,16 @@ export default function TypingGamePage() {
                       }
                     }, 50);
                   }}
-                  className="p-3 bg-white/10 hover:bg-white/20 rounded-full border border-white/20 hover:border-white/40 transition-all transform hover:scale-110 active:scale-95 cursor-pointer shadow-lg"
+                  className="p-2.5 sm:p-3 bg-white/10 hover:bg-white/20 rounded-full border border-white/20 hover:border-white/40 transition-all transform hover:scale-110 active:scale-95 cursor-pointer shadow-lg touch-manipulation"
                   title={`当前模式: ${TYPING_MODES.find((m) => m.id === currentMode)?.name || currentMode} - 点击跳转到游戏区域`}
                 >
-                  <span className="text-3xl">
+                  <span className="text-2xl sm:text-3xl block">
                     {TYPING_MODES.find((m) => m.id === currentMode)?.name.split(" ")[0] || "⌨️"}
                   </span>
                 </button>
-                <div className="hidden lg:flex">
+                <div className="flex items-center justify-center">
                   <VirtualKeyboardToggleButton />
                 </div>
-              </div>
-              
-              <div className="lg:hidden flex justify-center mb-4">
-                <VirtualKeyboardToggleButton />
               </div>
               <div className="w-24 h-1 bg-gradient-to-r from-purple-500 to-blue-500 mx-auto mb-8" />
               <p className="text-white/70 text-lg">
@@ -335,7 +340,7 @@ export default function TypingGamePage() {
             </div>
 
             {/* Game Component */}
-            <div data-typing-game-container>
+            <div className="w-full" data-typing-game-container>
               <TypingGame
                 onPlayingChange={setIsGamePlaying}
                 onStatsUpdate={handleStatsUpdate}

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
 import { SnakeGame } from "@/components/ui/snake-game";
 import { TetrisGame } from "@/components/ui/tetris-game";
 import { PongGame } from "@/components/ui/pong-game";
@@ -86,7 +87,7 @@ import {
   VirtualKeyboardToggleButton,
   useVirtualKeyboard,
 } from "@/components/ui/virtual-keyboard-toggle";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Home, UserRound } from "lucide-react";
 
 export default function GamePage() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
@@ -107,7 +108,7 @@ export default function GamePage() {
 
   return (
     <div
-      className="font-sans relative min-h-screen overflow-y-auto overflow-x-hidden"
+      className="font-sans relative min-h-screen w-full overflow-y-auto overflow-x-hidden"
       style={{ minHeight: "100dvh" }}
     >
       {/* Animated Background */}
@@ -190,7 +191,7 @@ export default function GamePage() {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 min-h-screen flex">
+      <div className="relative z-10 min-h-screen w-full flex">
         {/* Desktop Sidebar */}
         <div className="hidden lg:block relative z-50">
           <GameSidebar
@@ -236,13 +237,41 @@ export default function GamePage() {
 
         {/* Main Content */}
         <div
-          className="flex-1 p-8 gap-16 sm:p-20"
+          className="flex-1 w-full p-4 sm:p-6 md:p-8 lg:p-12 gap-16"
           style={{
             paddingBottom: isKeyboardOpen ? "calc(25vh + 2rem)" : "5rem",
             transition: "padding-bottom 0.3s ease-out",
           }}
         >
-          <main className="max-w-4xl mx-auto">
+          <main className="w-full">
+            {/* Navigation Bar */}
+            <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+              <div className="flex items-center gap-3 text-white/70 text-sm">
+                <Link
+                  href="/"
+                  className="flex items-center gap-2 rounded-full border border-white/10 px-3 py-1.5 text-white/80 hover:border-white/40 hover:text-white transition"
+                >
+                  <Home className="h-4 w-4" />
+                  <span>返回首页</span>
+                </Link>
+                <span className="hidden md:block text-white/40">|</span>
+                <span className="hidden md:block">游戏中心</span>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <Button
+                  asChild
+                  variant="ghost"
+                  className="text-white/80 hover:text-white"
+                >
+                  <Link href="/profile" className="flex items-center gap-2">
+                    <UserRound className="h-4 w-4" />
+                    <span className="hidden sm:inline">个人资料</span>
+                  </Link>
+                </Button>
+              </div>
+            </div>
+
             {/* Mobile Menu Button */}
             <div className="lg:hidden mb-4 flex items-center justify-between">
               <button
@@ -273,10 +302,10 @@ export default function GamePage() {
               />
             </div>
 
-            <div className="text-center mb-8">
-              <h1 className="mb-4">
+            <div className="text-center mb-6 sm:mb-8">
+              <h1 className="mb-3 sm:mb-4">
                 <TypingAnimation
-                  className="text-4xl sm:text-6xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent"
+                  className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent"
                   speed={50}
                   hideCursorAfterFinish
                 >
@@ -285,7 +314,7 @@ export default function GamePage() {
               </h1>
 
               {/* Top Game Icon - Clickable */}
-              <div className="flex items-center justify-center gap-4 mb-4">
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-4">
                 <button
                   onClick={() => {
                     // 滚动到游戏区域
@@ -301,24 +330,20 @@ export default function GamePage() {
                       }
                     }, 50);
                   }}
-                  className="p-3 bg-white/10 hover:bg-white/20 rounded-full border border-white/20 hover:border-white/40 transition-all transform hover:scale-110 active:scale-95 cursor-pointer shadow-lg"
+                  className="p-2.5 sm:p-3 bg-white/10 hover:bg-white/20 rounded-full border border-white/20 hover:border-white/40 transition-all transform hover:scale-110 active:scale-95 cursor-pointer shadow-lg touch-manipulation"
                   title={`当前游戏: ${
                     GAMES.find((g) => g.id === currentGame)?.name || currentGame
                   } - 点击跳转到游戏区域`}
                 >
-                  <span className="text-3xl">
+                  <span className="text-2xl sm:text-3xl block">
                     {GAMES.find((g) => g.id === currentGame)?.name.split(
                       " "
                     )[0] || "🎮"}
                   </span>
                 </button>
-                <div className="hidden lg:flex">
+                <div className="flex items-center justify-center">
                   <VirtualKeyboardToggleButton />
                 </div>
-              </div>
-
-              <div className="lg:hidden flex justify-center mb-4">
-                <VirtualKeyboardToggleButton />
               </div>
               <div className="w-24 h-1 bg-gradient-to-r from-purple-500 to-blue-500 mx-auto mb-8" />
               <TypingAnimation
@@ -338,7 +363,7 @@ export default function GamePage() {
             </div>
 
             {/* Game Content */}
-            <div className="min-h-[600px]" data-game-container>
+            <div className="min-h-[600px] w-full" data-game-container>
               {currentGame === "snake" && <SnakeGame />}
               {currentGame === "tetris" && <TetrisGame />}
               {currentGame === "pong" && <PongGame />}

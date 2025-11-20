@@ -6,10 +6,12 @@ import { PageLoading } from "@/components/ui/loading";
 import { OfflinePage, useNetworkStatus } from "@/components/ui/offline-detector";
 import { SimpleAnalytics } from "@/components/analytics/SimpleAnalytics";
 import { TypingAnimation } from "@/registry/magicui/typing-animation";
+import { useAuth } from "@/components/auth/AuthProvider";
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { UserRound, LogIn } from "lucide-react";
 
 function VideoTextDemo() {
   return (
@@ -30,6 +32,7 @@ export default function Home() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [isPageLoading, setIsPageLoading] = useState(true);
   const { isOnline } = useNetworkStatus();
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
 
   useEffect(() => {
     const handleMouseMove = (e: globalThis.MouseEvent) => {
@@ -209,6 +212,31 @@ export default function Home() {
             >
               <Link href="/access">how to access</Link>
             </Button>
+            {!authLoading && (
+              <>
+                {isAuthenticated ? (
+                  <Button
+                    asChild
+                    className="w-full border-0 bg-gradient-to-r from-pink-600 to-rose-600 text-white hover:from-pink-700 hover:to-rose-700 sm:w-auto"
+                  >
+                    <Link href="/profile" className="flex items-center gap-2">
+                      <UserRound className="h-4 w-4" />
+                      <span>个人资料</span>
+                    </Link>
+                  </Button>
+                ) : (
+                  <Button
+                    asChild
+                    className="w-full border-0 bg-gradient-to-r from-pink-600 to-rose-600 text-white hover:from-pink-700 hover:to-rose-700 sm:w-auto"
+                  >
+                    <Link href="/login" className="flex items-center gap-2">
+                      <LogIn className="h-4 w-4" />
+                      <span>登录</span>
+                    </Link>
+                  </Button>
+                )}
+              </>
+            )}
           </div>
         </main>
         <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center"></footer>
