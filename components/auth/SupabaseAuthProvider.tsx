@@ -43,7 +43,7 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
         const user: User = {
           id: authUser.id,
           username: authUser.username,
-          email: authUser.email,
+          email: authUser.email || "",
           loginTime: authUser.loginTime,
         };
 

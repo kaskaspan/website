@@ -121,8 +121,8 @@ export function SupabaseLoginForm() {
           setError(errorMessage);
         }
       }
-    } catch (err: any) {
-      setError(err.message || "发生错误，请重试");
+    } catch (err) {
+      setError((err as Error).message || "发生错误，请重试");
     } finally {
       setIsLoading(false);
     }

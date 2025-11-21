@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
 
-export default function AuthCallbackPage() {
+function CallbackContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [status, setStatus] = useState<"loading" | "success" | "error">("loading");
@@ -32,7 +32,7 @@ export default function AuthCallbackPage() {
               router.push("/login?verified=true");
             }, 2000);
           }
-        } catch (err: any) {
+        } catch (err) {
           setStatus("error");
           setMessage("验证过程中发生错误");
         }
@@ -99,3 +99,16 @@ export default function AuthCallbackPage() {
 }
 
 
+
+
+export default function AuthCallbackPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
+      </div>
+    }>
+      <CallbackContent />
+    </Suspense>
+  );
+}

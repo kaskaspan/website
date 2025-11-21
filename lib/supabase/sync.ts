@@ -20,15 +20,13 @@ export async function syncTypingSession(record: TypingSessionRecord) {
       lesson_id: record.lessonId,
       wpm: record.summary.wpm,
       accuracy: record.summary.accuracy,
-      correct_chars: record.summary.correctChars,
-      error_chars: record.summary.errorChars,
+      correct_chars: Math.round((record.summary.cpm * (record.summary.durationMs / 60000)) * (record.summary.accuracy / 100)),
+      error_chars: Math.round((record.summary.cpm * (record.summary.durationMs / 60000)) * (record.summary.errorRate)),
       duration_ms: record.summary.durationMs,
-      stars: record.summary.stars,
-      is_completed: record.summary.isCompleted,
+      stars: record.summary.starRating,
+      is_completed: true, // Assuming synced sessions are completed
       started_at: new Date(record.timestamp).toISOString(),
-      completed_at: record.summary.isCompleted 
-        ? new Date(record.timestamp).toISOString() 
-        : null,
+      completed_at: new Date(record.timestamp).toISOString(),
     })
 
   if (sessionError) {
@@ -42,6 +40,15 @@ export async function syncTypingSession(record: TypingSessionRecord) {
   }
 
   return { success: true }
+}
+
+interface LessonProgressUpdate {
+  attempts: number
+  updated_at: string
+  best_wpm?: number
+  best_accuracy?: number
+  best_stars?: number
+  completed_at?: string
 }
 
 // 更新课程进度
@@ -62,7 +69,7 @@ async function updateLessonProgress(
 
   if (existing) {
     // 更新现有记录
-    const updates: any = {
+    const updates: LessonProgressUpdate = {
       attempts: existing.attempts + 1,
       updated_at: new Date().toISOString(),
     }
@@ -73,10 +80,10 @@ async function updateLessonProgress(
     if (summary.accuracy > existing.best_accuracy) {
       updates.best_accuracy = summary.accuracy
     }
-    if (summary.stars > existing.best_stars) {
-      updates.best_stars = summary.stars
+    if (summary.starRating > existing.best_stars) {
+      updates.best_stars = summary.starRating
     }
-    if (summary.isCompleted && !existing.completed_at) {
+    if (!existing.completed_at) {
       updates.completed_at = new Date().toISOString()
     }
 
@@ -93,9 +100,9 @@ async function updateLessonProgress(
         lesson_id: lessonId,
         best_wpm: summary.wpm,
         best_accuracy: summary.accuracy,
-        best_stars: summary.stars,
+        best_stars: summary.starRating,
         attempts: 1,
-        completed_at: summary.isCompleted ? new Date().toISOString() : null,
+        completed_at: new Date().toISOString(),
       })
   }
 }
