@@ -8,6 +8,7 @@ const nextConfig: NextConfig = {
       config.resolve.alias = {
         ...config.resolve.alias,
         // Ensure we don't bundle modules that use Node.js APIs not available in Edge
+        ws: false,
       };
       
       // Define process.versions for Edge Runtime
