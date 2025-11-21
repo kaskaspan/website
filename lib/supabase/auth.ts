@@ -36,6 +36,32 @@ export async function loginWithEmail(email: string, password: string) {
   return { success: false, message: '登录失败' }
 }
 
+// 使用 Google 登录
+export async function loginWithGoogle() {
+  const supabase = createClient()
+  
+  const redirectTo = typeof window !== 'undefined' 
+    ? `${window.location.origin}/auth/callback`
+    : undefined
+
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo,
+      queryParams: {
+        access_type: 'offline',
+        prompt: 'consent',
+      },
+    },
+  })
+
+  if (error) {
+    return { success: false, message: error.message }
+  }
+
+  return { success: true, data }
+}
+
 // 注册新用户
 export async function signUp(email: string, password: string, username: string) {
   const supabase = createClient()
