@@ -5,6 +5,7 @@ export interface AuthUser {
   id: string
   username: string
   email?: string
+  avatar?: string
   loginTime: number
 }
 
@@ -114,7 +115,7 @@ async function getUserFromSupabase(user: User): Promise<AuthUser> {
   // 获取用户档案
   const { data: profile } = await supabase
     .from('user_profiles')
-    .select('username')
+    .select('username, avatar_url')
     .eq('id', user.id)
     .single()
   
@@ -122,6 +123,7 @@ async function getUserFromSupabase(user: User): Promise<AuthUser> {
     id: user.id,
     username: profile?.username || user.email?.split('@')[0] || '用户',
     email: user.email,
+    avatar: profile?.avatar_url,
     loginTime: Date.now(),
   }
 }
@@ -211,5 +213,22 @@ export async function loginWithUsername(username: string) {
     success: false,
     message: '请使用邮箱和密码登录。',
   }
+}
+
+// 更新用户头像
+export async function updateUserAvatar(userId: string, avatarUrl: string) {
+  const supabase = createClient()
+  
+  const { error } = await supabase
+    .from('user_profiles')
+    .update({ avatar_url: avatarUrl })
+    .eq('id', userId)
+  
+  if (error) {
+    console.error('更新头像失败:', error)
+    return { success: false, message: error.message }
+  }
+  
+  return { success: true }
 }
 

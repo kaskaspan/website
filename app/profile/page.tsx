@@ -7,6 +7,8 @@ import { Card } from "@/components/ui/card";
 import { Home, LogOut, UserRound } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { GameHistory } from "@/components/profile/GameHistory";
+import { AvatarSelector } from "@/components/profile/AvatarSelector";
 
 export default function ProfilePage() {
   const { isAuthenticated, user, isLoading, logout } = useAuth();
@@ -100,8 +102,29 @@ export default function ProfilePage() {
             {/* Profile Card */}
             <Card className="bg-gradient-to-br from-purple-900/90 via-blue-900/90 to-indigo-900/90 border-white/20 backdrop-blur-xl p-6 sm:p-8">
               <div className="flex flex-col items-center text-center mb-6">
-                <div className="w-24 h-24 rounded-full bg-gradient-to-br from-purple-400 to-blue-400 flex items-center justify-center mb-4 shadow-lg">
-                  <UserRound className="h-12 w-12 text-white" />
+                <div className="relative group">
+                  <div className="w-24 h-24 rounded-full bg-gradient-to-br from-purple-400 to-blue-400 flex items-center justify-center mb-4 shadow-lg overflow-hidden border-4 border-white/10">
+                    {user?.avatar ? (
+                      <img 
+                        src={user.avatar} 
+                        alt={user.username} 
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <UserRound className="h-12 w-12 text-white" />
+                    )}
+                  </div>
+                  <div className="absolute bottom-4 right-0">
+                    <AvatarSelector 
+                      currentAvatar={user?.avatar} 
+                      onAvatarChange={(url) => {
+                        // Force a reload to update the user context or update local state if possible
+                        // Ideally useAuth should expose a way to update user, but for now we rely on the selector updating the DB
+                        // and we can manually update the UI or reload
+                        window.location.reload();
+                      }} 
+                    />
+                  </div>
                 </div>
                 <h1 className="text-3xl sm:text-4xl font-bold text-white mb-2">
                   {user?.username || "用户"}
@@ -168,6 +191,11 @@ export default function ProfilePage() {
                 </Button>
               </div>
             </Card>
+
+            {/* Game History */}
+            <div className="mt-8">
+              <GameHistory />
+            </div>
           </main>
         </div>
       </div>
