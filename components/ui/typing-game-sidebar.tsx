@@ -50,7 +50,7 @@ export function TypingGameSidebar({
 
   return (
     <Card
-      className={`h-full bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 border-white/20 transition-all duration-300 relative z-50 ${
+      className={`h-full bg-white border-r border-gray-200 transition-all duration-300 relative z-50 ${
         isCollapsed ? "w-16" : "w-64"
       }`}
     >
@@ -69,7 +69,7 @@ export function TypingGameSidebar({
                 }}
                 variant="ghost"
                 size="lg"
-                className="w-full h-12 mb-2 text-white hover:bg-white/20 rounded-lg transition-all"
+                className="w-full h-12 mb-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-all"
                 title={TYPING_MODES.find((m) => m.id === currentMode)?.name || "Current Mode"}
               >
                 <span className="text-2xl">
@@ -81,19 +81,19 @@ export function TypingGameSidebar({
                 onClick={() => setIsCollapsed(!isCollapsed)}
                 variant="ghost"
                 size="sm"
-                className="text-white hover:bg-white/10 w-full"
+                className="text-gray-500 hover:bg-gray-100 w-full"
               >
                 →
               </Button>
             </>
           ) : (
             <div className="flex items-center justify-between w-full">
-              <h2 className="text-xl font-bold text-white">⌨️ 打字模式</h2>
+              <h2 className="text-xl font-bold text-gray-800">⌨️ 打字模式</h2>
               <Button
                 onClick={() => setIsCollapsed(!isCollapsed)}
                 variant="ghost"
                 size="sm"
-                className="text-white hover:bg-white/10"
+                className="text-gray-500 hover:bg-gray-100"
               >
                 ←
               </Button>
@@ -103,23 +103,29 @@ export function TypingGameSidebar({
 
         {/* Divider */}
         {!isCollapsed && (
-          <div className="w-full h-px bg-gradient-to-r from-transparent via-white/20 to-transparent mb-4" />
+          <div className="w-full h-px bg-gray-200 mb-4" />
         )}
 
         {/* Mode List */}
-        <div className={`flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent ${isCollapsed ? "space-y-2" : "space-y-2"}`}>
+        <div className={`flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent ${isCollapsed ? "space-y-2" : "space-y-2"}`}>
           {TYPING_MODES.map((mode) => (
             <Button
               key={mode.id}
               onClick={() => onModeSelect(mode.id)}
               className={`w-full h-auto transition-all duration-200 ${
-                isCollapsed 
-                  ? "justify-center p-2" 
-                  : "justify-start text-left p-3"
+                isCollapsed ? "justify-center" : "justify-start text-left"
+              } ${
+                mode.id === "custom"
+                  ? isCollapsed
+                    ? "p-4"
+                    : "p-5"
+                  : isCollapsed
+                    ? "p-2"
+                    : "p-3"
               } ${
                 currentMode === mode.id
-                  ? "bg-purple-600 text-white shadow-lg"
-                  : "bg-white/10 text-white hover:bg-white/20"
+                  ? "bg-blue-50 text-blue-700 border border-blue-200 shadow-sm"
+                  : "bg-transparent text-gray-600 hover:bg-gray-50 hover:text-gray-900"
               }`}
             >
               <div className={`flex items-center ${isCollapsed ? "justify-center" : "space-x-3"}`}>
@@ -141,14 +147,14 @@ export function TypingGameSidebar({
             <Button
               variant="outline"
               size="sm"
-              className="w-full text-white border-white/30 hover:bg-white/10"
+              className="w-full text-gray-700 border-gray-300 hover:bg-gray-50"
             >
               📊 统计信息
             </Button>
             <Button
               variant="outline"
               size="sm"
-              className="w-full text-white border-white/30 hover:bg-white/10"
+              className="w-full text-gray-700 border-gray-300 hover:bg-gray-50"
             >
               ⚙️ 设置
             </Button>

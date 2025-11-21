@@ -4,6 +4,13 @@ import Link from "next/link";
 import { TypingGame } from "@/components/ui/typing-game";
 import { TypingGameSidebar } from "@/components/ui/typing-game-sidebar";
 import { TypingGameRightSidebar } from "@/components/ui/typing-game-right-sidebar";
+import { Achievements } from "@/components/game/Achievements";
+import { TypingTips } from "@/components/game/TypingTips";
+import { SpeedMode } from "@/components/game/SpeedMode";
+import { AccuracyMode } from "@/components/game/AccuracyMode";
+import { CodeMode } from "@/components/game/CodeMode";
+import { QuoteMode } from "@/components/game/QuoteMode";
+import { CustomMode } from "@/components/game/CustomMode";
 
 // 打字模式列表
 const TYPING_MODES = [
@@ -119,10 +126,11 @@ export default function TypingGamePage() {
   return (
     <div className="font-sans relative min-h-screen w-full overflow-y-auto overflow-x-hidden" style={{ minHeight: '100dvh' }}>
       {/* Animated Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
-        {/* Floating orbs */}
+      {/* Animated Background - Light Theme */}
+      <div className="absolute inset-0 bg-gray-50">
+        {/* Floating orbs - Subtle for light theme */}
         <div
-          className="absolute w-96 h-96 bg-purple-500/20 rounded-full blur-3xl animate-pulse"
+          className="absolute w-96 h-96 bg-blue-200/30 rounded-full blur-3xl animate-pulse"
           style={{
             left:
               typeof window !== "undefined"
@@ -135,7 +143,7 @@ export default function TypingGamePage() {
           }}
         />
         <div
-          className="absolute w-80 h-80 bg-blue-500/20 rounded-full blur-3xl animate-pulse delay-1000"
+          className="absolute w-80 h-80 bg-purple-200/30 rounded-full blur-3xl animate-pulse delay-1000"
           style={{
             right:
               typeof window !== "undefined"
@@ -147,28 +155,12 @@ export default function TypingGamePage() {
                 : "20%",
           }}
         />
-        <div
-          className="absolute w-64 h-64 bg-indigo-500/20 rounded-full blur-3xl animate-pulse delay-2000"
-          style={{
-            left:
-              typeof window !== "undefined"
-                ? `${50 + (mousePosition.x / window.innerWidth) * 5}%`
-                : "50%",
-            top:
-              typeof window !== "undefined"
-                ? `${60 + (mousePosition.y / window.innerHeight) * 5}%`
-                : "60%",
-          }}
-        />
-
-        {/* Grid pattern */}
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[size:50px_50px]" />
-
-        {/* Gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/30" />
+        
+        {/* Grid pattern - Darker for visibility on light bg */}
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(0,0,0,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(0,0,0,0.03)_1px,transparent_1px)] bg-[size:50px_50px]" />
       </div>
 
-      {/* Floating particles */}
+      {/* Floating particles - Darker for light theme */}
       <div className="absolute inset-0 pointer-events-none">
         {[...Array(20)].map((_, i) => {
           const seed = i * 0.1;
@@ -184,7 +176,7 @@ export default function TypingGamePage() {
           return (
             <div
               key={i}
-              className="absolute w-1 h-1 bg-white/30 rounded-full animate-pulse"
+              className="absolute w-1 h-1 bg-blue-500/20 rounded-full animate-pulse"
               style={{
                 left: `${left}%`,
                 top: `${top}%`,
@@ -221,12 +213,12 @@ export default function TypingGamePage() {
             ${isMobileSidebarOpen ? "translate-x-0" : "-translate-x-full"}
           `}
         >
-          <div className="h-full bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 border-r border-white/20 p-4 overflow-y-auto">
+          <div className="h-full bg-white border-r border-gray-200 p-4 overflow-y-auto">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-bold text-white">⌨️ 打字模式</h2>
+              <h2 className="text-xl font-bold text-gray-800">⌨️ 打字模式</h2>
               <button
                 onClick={() => setIsMobileSidebarOpen(false)}
-                className="text-white hover:bg-white/10 p-2 rounded"
+                className="text-gray-500 hover:bg-gray-100 p-2 rounded"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -254,50 +246,50 @@ export default function TypingGamePage() {
             <div className="lg:hidden mb-4 flex items-center justify-between">
               <button
                 onClick={() => setIsMobileSidebarOpen(true)}
-                className="p-2 bg-white/10 hover:bg-white/20 rounded-lg text-white transition-colors"
+                className="p-2 bg-white border border-gray-200 hover:bg-gray-50 rounded-lg text-gray-700 transition-colors"
               >
                 <Menu className="h-6 w-6" />
               </button>
               <VirtualKeyboardToggleButton />
             </div>
-            <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-              <div className="flex items-center gap-3 text-white/70 text-sm">
-                <Link
-                  href="/"
-                  className="rounded-full border border-white/10 px-3 py-1 text-white/80 hover:border-white/40 hover:text-white transition"
-                >
-                  ⬅️ 返回首页
-                </Link>
-                <span className="hidden md:block text-white/40">|</span>
-                <span className="hidden md:block">盲打教程 · 新手到高手路线</span>
-              </div>
+              <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                <div className="flex items-center gap-3 text-gray-600 text-sm">
+                  <Link
+                    href="/"
+                    className="rounded-full border border-gray-300 px-3 py-1 text-gray-600 hover:border-gray-400 hover:text-gray-900 transition"
+                  >
+                    ⬅️ 返回首页
+                  </Link>
+                  <span className="hidden md:block text-gray-300">|</span>
+                  <span className="hidden md:block">盲打教程 · 新手到高手路线</span>
+                </div>
 
-              <div className="flex items-center gap-3">
-                {!authLoading && (
-                  <>
-                    {isAuthenticated ? (
-                      <Button
-                        asChild
-                        variant="outline"
-                        className="border-white/30 text-white/90 hover:bg-white/10"
-                      >
-                        <Link href="/profile" className="flex items-center gap-2">
-                          <UserRound className="h-4 w-4" />
-                          <span className="hidden sm:inline">个人资料</span>
-                        </Link>
-                      </Button>
-                    ) : (
-                      <Button asChild variant="ghost" className="text-white/80 hover:text-white">
-                        <Link href="/login" className="flex items-center gap-2">
-                          <LogIn className="h-4 w-4" />
-                          <span className="hidden sm:inline">登录</span>
-                        </Link>
-                      </Button>
-                    )}
-                  </>
-                )}
+                <div className="flex items-center gap-3">
+                  {!authLoading && (
+                    <>
+                      {isAuthenticated ? (
+                        <Button
+                          asChild
+                          variant="outline"
+                          className="border-gray-300 text-gray-700 hover:bg-gray-100"
+                        >
+                          <Link href="/profile" className="flex items-center gap-2">
+                            <UserRound className="h-4 w-4" />
+                            <span className="hidden sm:inline">个人资料</span>
+                          </Link>
+                        </Button>
+                      ) : (
+                        <Button asChild variant="ghost" className="text-gray-600 hover:text-gray-900 hover:bg-gray-100">
+                          <Link href="/login" className="flex items-center gap-2">
+                            <LogIn className="h-4 w-4" />
+                            <span className="hidden sm:inline">登录</span>
+                          </Link>
+                        </Button>
+                      )}
+                    </>
+                  )}
+                </div>
               </div>
-            </div>
 
             <div className="text-center mb-6 sm:mb-8">
               <h1 className="mb-3 sm:mb-4">
@@ -321,7 +313,7 @@ export default function TypingGamePage() {
                       }
                     }, 50);
                   }}
-                  className="p-2.5 sm:p-3 bg-white/10 hover:bg-white/20 rounded-full border border-white/20 hover:border-white/40 transition-all transform hover:scale-110 active:scale-95 cursor-pointer shadow-lg touch-manipulation"
+                  className="p-2.5 sm:p-3 bg-white hover:bg-gray-50 rounded-full border border-gray-200 hover:border-gray-300 transition-all transform hover:scale-110 active:scale-95 cursor-pointer shadow-sm touch-manipulation"
                   title={`当前模式: ${TYPING_MODES.find((m) => m.id === currentMode)?.name || currentMode} - 点击跳转到游戏区域`}
                 >
                   <span className="text-2xl sm:text-3xl block">
@@ -333,7 +325,7 @@ export default function TypingGamePage() {
                 </div>
               </div>
               <div className="w-24 h-1 bg-gradient-to-r from-purple-500 to-blue-500 mx-auto mb-8" />
-              <p className="text-white/70 text-lg">
+              <p className="text-gray-600 text-lg">
                 Improve your typing speed and accuracy
               </p>
               <SmoothCursor enabled={!isGamePlaying} />
@@ -341,17 +333,37 @@ export default function TypingGamePage() {
 
             {/* Game Component */}
             <div className="w-full" data-typing-game-container>
-              <TypingGame
-                onPlayingChange={setIsGamePlaying}
-                onStatsUpdate={handleStatsUpdate}
+              <div className="flex justify-end mb-4">
+                <TypingTips />
+              </div>
+              {currentMode === "classic" && (
+                <TypingGame
+                  onPlayingChange={setIsGamePlaying}
+                  onStatsUpdate={handleStatsUpdate}
+                />
+              )}
+              {currentMode === "speed" && <SpeedMode />}
+              {currentMode === "accuracy" && <AccuracyMode />}
+              {currentMode === "code" && <CodeMode />}
+              {currentMode === "quote" && <QuoteMode />}
+              {currentMode === "custom" && <CustomMode />}
+            </div>
+
+            {/* Achievements Section */}
+            <div className="mt-12">
+              <Achievements 
+                wpm={gameStats.wpm} 
+                accuracy={gameStats.accuracy} 
+                highScore={gameStats.highScore}
+                gamesPlayed={gameStats.isCompleted ? 1 : 0} // Simple tracking for now
               />
             </div>
 
             {/* Back Button */}
-            <div className="mt-12 pt-8 border-t border-white/20 text-center">
+            <div className="mt-12 pt-8 border-t border-gray-200 text-center">
               <Link
                 href="/"
-                className="group inline-flex items-center gap-2 px-8 py-3 bg-gradient-to-r from-purple-600/20 to-blue-600/20 text-blue-400 hover:text-white hover:from-purple-600/40 hover:to-blue-600/40 rounded-full border border-blue-400/30 hover:border-purple-400/50 transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:shadow-purple-500/25"
+                className="group inline-flex items-center gap-2 px-8 py-3 bg-white text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-full border border-gray-300 hover:border-gray-400 transition-all duration-300 transform hover:scale-105 hover:shadow-md"
               >
                 <span className="group-hover:-translate-x-1 transition-transform duration-300">
                   ←

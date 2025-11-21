@@ -2,19 +2,21 @@
 
 import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import styles from "@/components/ui/typing-game.module.css";
+import TypingProgress from "@/components/ui/typing-progress";
 import useTypingGame, {
   PhaseType,
 } from "react-typing-game-hook";
 import { integrateGameWithAutoRecorder } from "@/lib/auto-recorder";
 import { addTypingSession } from "@/lib/typing-analytics";
 import {
-  TextDisplay,
   VirtualKeyboard,
   StatsPanel,
   TypingController,
   VirtualHands,
 } from "@/components/ui/typing/core";
+// Removed TextDisplay import; we'll render lesson text directly.
+
 import { LessonSelector } from "@/components/ui/typing/lessons";
 import { TypingSettingsPanel } from "@/components/ui/typing/settings";
 import { useKeySound } from "@/hooks/useKeySound";
@@ -32,6 +34,7 @@ import {
 import type { SessionSummary } from "@/types";
 import type { LessonContent } from "@/types";
 import Link from "next/link";
+import { div, pre } from "motion/react-client";
 
 const KEY_GUIDES = [
   {
@@ -159,12 +162,18 @@ interface TypingGameProps {
     stars: number;
     isCompleted: boolean;
   }) => void;
+  /**
+   * If provided, overrides the lesson text used by the game.
+   * Useful for mode‑specific wrappers.
+   */
+  overrideLessonText?: string;
 }
 
 export function TypingGame({
   onPlayingChange,
   onStatsUpdate,
-}: TypingGameProps) {
+  overrideLessonText,
+}: TypingGameProps & { overrideLessonText?: string }) {
   const dispatch = useAppDispatch();
   const {
     selectedLessonId,
@@ -200,11 +209,12 @@ export function TypingGame({
   }, [contents, selectedLessonId, tracks]);
 
   const lessonText = useMemo(() => {
+    if (overrideLessonText) return overrideLessonText;
     const text = activeLesson?.content
       ? extractLessonText(activeLesson.content)
       : "";
     return text || DEFAULT_FALLBACK_TEXT;
-  }, [activeLesson]);
+  }, [overrideLessonText, activeLesson]);
 
   const lessonTitle = activeLesson?.lesson.title ?? "自由练习";
   const lessonId = activeLesson?.lesson.id ?? "custom-lesson";
@@ -461,35 +471,34 @@ export function TypingGame({
   return (
     <>
       <TypingSettingsPanel open={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
-      <Card
-        className={`w-full max-w-4xl mx-auto p-8 bg-gradient-to-br from-purple-900/50 via-blue-900/50 to-indigo-900/50 border-white/20 backdrop-blur-sm ${preferences.accessibility.highContrastMode ? "border-yellow-300/60" : ""}`}
-      >
-      <div className="space-y-6">
+      <div className={styles.container}>
+        <TypingProgress progress={chars.length ? (currIndex / chars.length) * 100 : 0} />
+        <div className="space-y-6">
         {/* Header */}
         <div className="flex flex-col items-center gap-4 md:flex-row md:items-start md:justify-between">
           <div className="text-center space-y-2 md:text-left">
-            <h2 className="text-4xl font-bold text-white">⌨️ Typing Game</h2>
-            <p className="text-white/70 text-base">
+            <h2 className="text-4xl font-bold text-gray-900">⌨️ Typing Game</h2>
+            <p className="text-gray-600 text-base">
               从基准键开始，逐步覆盖整块键盘。
             </p>
-            <p className="text-sm text-white/50">当前课程：{lessonTitle}</p>
+            <p className="text-sm text-gray-500">当前课程：{lessonTitle}</p>
           </div>
           <div className="flex items-center gap-2">
             <Button
               variant="outline"
               size="sm"
-              className="border-white/20 text-white"
+              className="border-gray-300 text-gray-700 hover:bg-gray-100"
               onClick={() => setIsSettingsOpen(true)}
             >
               ⚙️ 设置
             </Button>
-            <Button asChild variant="outline" size="sm" className="border-white/20 text-white">
+            <Button asChild variant="outline" size="sm" className="border-gray-300 text-gray-700 hover:bg-gray-100">
               <Link href="/typing-analytics">统计</Link>
             </Button>
             <Button
               variant="outline"
               size="sm"
-              className="border-white/20 text-white"
+              className="border-gray-300 text-gray-700 hover:bg-gray-100"
               onClick={selectNewText}
             >
               下一推荐
@@ -500,7 +509,7 @@ export function TypingGame({
         <LessonSelector />
 
         {/* Lesson Guide */}
-        <div className="relative overflow-hidden rounded-2xl border border-white/15 bg-white/5 p-6">
+        <div className="relative overflow-hidden rounded-2xl border border-gray-200 bg-gray-900 p-6 text-white">
           <div className="flex flex-wrap items-center gap-3">
             <div>
               <h3 className="text-lg font-semibold text-white">入门引导小方块</h3>
@@ -576,43 +585,52 @@ export function TypingGame({
 
         {/* Typing Area */}
         <TypingController enabled={isPlaying} onKeyDown={handleKeyDown}>
-          <div className="bg-black/30 rounded-lg p-6 min-h-[220px] border border-white/10 focus-within:border-purple-400/50 transition-colors">
-          {!isPlaying ? (
+          <div className="bg-gray-50 rounded-lg p-6 min-h-[220px] border border-gray-200 focus-within:border-blue-400 transition-colors shadow-inner">
+            {!isPlaying ? (
               <div className="flex min-h-[180px] flex-col items-center justify-center gap-6 text-center">
                 <div>
-                  <p className="text-white/80 text-lg font-medium">
+                  <p className="text-gray-800 text-lg font-medium">
                     准备好开始盲打旅程了吗？
                   </p>
-                  <p className="text-white/50 text-sm mt-2 max-w-xl">
+                  <p className="text-gray-500 text-sm mt-2 max-w-xl">
                     按照小方块的顺序：先练 J · F，再练 K · D、L · S、A · ;，最后补充 Shift 与 Enter。
                     不看键盘，跟着节奏敲击。
                   </p>
                 </div>
-                <div className="grid w-full grid-cols-1 gap-3 text-sm text-white/70 sm:grid-cols-2">
-                  <div className="rounded-lg border border-white/10 bg-white/5 px-3 py-2">
-                    1. 手指轻放在 <span className="font-semibold text-white">F</span> 与 <span className="font-semibold text-white">J</span>。
+                <div className="grid w-full grid-cols-1 gap-3 text-sm text-gray-600 sm:grid-cols-2">
+                  <div className="rounded-lg border border-gray-200 bg-white px-3 py-2 shadow-sm">
+                    1. 手指轻放在 <span className="font-semibold text-gray-900">F</span> 与 <span className="font-semibold text-gray-900">J</span>。
                   </div>
-                  <div className="rounded-lg border border-white/10 bg-white/5 px-3 py-2">
-                    2. 食指向外探到 <span className="font-semibold text-white">K</span> / <span className="font-semibold text-white">D</span>，随时回到基准键。
+                  <div className="rounded-lg border border-gray-200 bg-white px-3 py-2 shadow-sm">
+                    2. 食指向外探到 <span className="font-semibold text-gray-900">K</span> / <span className="font-semibold text-gray-900">D</span>，随时回到基准键。
                   </div>
-                  <div className="rounded-lg border border-white/10 bg-white/5 px-3 py-2">
-                    3. 小指负责 <span className="font-semibold text-white">Shift</span> 与 <span className="font-semibold text-white">Enter</span>。
+                  <div className="rounded-lg border border-gray-200 bg-white px-3 py-2 shadow-sm">
+                    3. 小指负责 <span className="font-semibold text-gray-900">Shift</span> 与 <span className="font-semibold text-gray-900">Enter</span>。
                   </div>
-                  <div className="rounded-lg border border-white/10 bg-white/5 px-3 py-2">
-                    4. 获得 <span className="font-semibold text-yellow-300">4 ⭐</span> 即可进入下一阶段。
+                  <div className="rounded-lg border border-gray-200 bg-white px-3 py-2 shadow-sm">
+                    4. 获得 <span className="font-semibold text-yellow-600">4 ⭐</span> 即可进入下一阶段。
                   </div>
                 </div>
-              <Button
-                onClick={startGame}
-                className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white"
-              >
+                <Button
+                  onClick={startGame}
+                  className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white"
+                >
                   开始练习
-              </Button>
-            </div>
-          ) : (
-              <TextDisplay text={chars} cursorIndex={currIndex} />
-          )}
-        </div>
+                </Button>
+              </div>
+            ) : (
+              <div className={styles.lesson}>
+                {lessonText.split("").map((c, i) => (
+                  <span
+                    key={i}
+                    className={i === currIndex ? "text-green-600 bg-green-100" : undefined}
+                  >
+                    {c}
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
         </TypingController>
 
         <VirtualKeyboard keyStates={keyboardStates} />
@@ -635,7 +653,7 @@ export function TypingGame({
         {/* Game Over */}
         {phase === PhaseType.Ended && (
           <div className="text-center space-y-4">
-            <div className="rounded-2xl border border-white/15 bg-white/10 p-6 backdrop-blur-sm">
+            <div className="rounded-2xl border border-gray-200 bg-gray-900 p-6 text-white backdrop-blur-sm">
               <div className="mb-3 flex justify-center gap-1 text-3xl">
                 {Array.from({ length: 5 }).map((_, index) => (
                   <span
@@ -674,7 +692,7 @@ export function TypingGame({
             <Button
               onClick={resetGame}
               variant="outline"
-              className="text-white border-white/30 hover:bg-white/10"
+              className="text-gray-700 border-gray-300 hover:bg-gray-100"
             >
               结束本轮
             </Button>
@@ -684,14 +702,14 @@ export function TypingGame({
         {/* High Score */}
         {highScore > 0 && (
           <div className="text-center">
-            <p className="text-white/70 text-sm">
+            <p className="text-gray-600 text-sm">
               最高分：
-              <span className="text-yellow-400 font-bold">{highScore}</span>
+              <span className="text-yellow-600 font-bold">{highScore}</span>
             </p>
           </div>
         )}
       </div>
-    </Card>
+    </div>
     </>
   );
 }

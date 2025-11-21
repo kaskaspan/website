@@ -17,17 +17,17 @@ const DEFAULT_LAYOUT: string[][] = [
 ];
 
 const stateClassMap: Record<KeyState, string> = {
-  idle: "bg-white/10 border-white/20 text-white/80",
-  active: "bg-purple-500/60 border-purple-200/80 text-white",
-  correct: "bg-emerald-500/60 border-emerald-200/80 text-white",
-  incorrect: "bg-rose-500/60 border-rose-100/80 text-white",
-  hint: "bg-blue-500/40 border-blue-200/80 text-white",
+  idle: "bg-white border-gray-200 text-gray-600 shadow-sm",
+  active: "bg-purple-100 border-purple-300 text-purple-900 shadow-sm",
+  correct: "bg-emerald-100 border-emerald-300 text-emerald-900 shadow-sm",
+  incorrect: "bg-rose-100 border-rose-300 text-rose-900 shadow-sm",
+  hint: "bg-blue-100 border-blue-300 text-blue-900 shadow-sm",
 };
 
 export const VirtualKeyboard = memo<VirtualKeyboardProps>(
   ({ layout = DEFAULT_LAYOUT, keyStates }) => {
     return (
-      <div className="flex flex-col items-center gap-2 rounded-xl border border-white/10 bg-white/5 p-4 backdrop-blur">
+      <div className="flex flex-col items-center gap-2 rounded-xl border border-gray-200 bg-gray-100 p-4">
         {layout.map((row, rowIndex) => (
           <div key={rowIndex} className="flex gap-2">
             {row.map((key) => {
