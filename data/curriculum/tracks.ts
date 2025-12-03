@@ -73,5 +73,28 @@ export const lessonTracks: LessonTrack[] = [
       },
     ],
   },
+  {
+    id: "books",
+    name: "Books",
+    description: "经典小说与故事阅读练习。",
+    skillBranch: "advanced",
+    difficultyIndex: 30,
+    prerequisites: [],
+    lessons: [
+      {
+        id: "book-world-end",
+        title: "世界末日",
+        estimatedMinutes: 60,
+        tags: ["story", "long-form"],
+        contentRef: "content-book-world-end",
+        difficulty: {
+          speed: 30,
+          accuracy: 90,
+          complexity: 40,
+        },
+        skillAttributes: ["endurance", "reading"],
+      },
+    ],
+  },
 ];
 

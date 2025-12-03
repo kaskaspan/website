@@ -7,6 +7,7 @@ import { AuthProvider } from "@/components/auth/AuthProvider";
 import { StoreProvider } from "@/store/StoreProvider";
 import { VirtualInputPanel } from "@/components/ui/virtual-input-panel";
 import { VirtualKeyboardProvider } from "@/components/ui/virtual-keyboard-toggle";
+import { ThemeProvider } from "@/components/theme-provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,18 +30,25 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <StoreProvider>
           <AuthProvider>
             <VirtualKeyboardProvider>
-              <OfflineDetector />
-              {/* Google Analytics - Replace with your Measurement ID */}
-              <GoogleAnalytics measurementId="G-XXXXXXXXXX" />
-              {children}
-              <VirtualInputPanel />
+              <ThemeProvider
+                attribute="class"
+                defaultTheme="system"
+                enableSystem
+                disableTransitionOnChange
+              >
+                <OfflineDetector />
+                {/* Google Analytics - Replace with your Measurement ID */}
+                <GoogleAnalytics measurementId="G-XXXXXXXXXX" />
+                {children}
+                <VirtualInputPanel />
+              </ThemeProvider>
             </VirtualKeyboardProvider>
           </AuthProvider>
         </StoreProvider>

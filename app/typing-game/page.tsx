@@ -1,6 +1,8 @@
 "use client";
 
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 import { TypingGame } from "@/components/ui/typing-game";
 import { TypingGameSidebar } from "@/components/ui/typing-game-sidebar";
 import { TypingGameRightSidebar } from "@/components/ui/typing-game-right-sidebar";
@@ -11,6 +13,7 @@ import { AccuracyMode } from "@/components/game/AccuracyMode";
 import { CodeMode } from "@/components/game/CodeMode";
 import { QuoteMode } from "@/components/game/QuoteMode";
 import { CustomMode } from "@/components/game/CustomMode";
+import { BookMode } from "@/components/game/BookMode";
 
 // 打字模式列表
 const TYPING_MODES = [
@@ -19,6 +22,7 @@ const TYPING_MODES = [
   { id: "accuracy", name: "🎯 准确度训练" },
   { id: "code", name: "💻 代码练习" },
   { id: "quote", name: "💬 名言警句" },
+  { id: "book", name: "📖 阅读模式" },
   { id: "custom", name: "✏️ 自定义文本" },
 ];
 import { useState, useEffect, useCallback } from "react";
@@ -28,8 +32,10 @@ import { Button } from "@/components/ui/button";
 import { LogIn, UserRound, Menu, X } from "lucide-react";
 import { VirtualKeyboardToggleButton, useVirtualKeyboard } from "@/components/ui/virtual-keyboard-toggle";
 import { useAuth } from "@/components/auth/AuthProvider";
+import { ModeToggle } from "@/components/mode-toggle";
 
-export default function TypingGamePage() {
+function TypingGameContent() {
+  const searchParams = useSearchParams();
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [isGamePlaying, setIsGamePlaying] = useState(false);
   const [currentMode, setCurrentMode] = useState("classic");
@@ -46,6 +52,13 @@ export default function TypingGamePage() {
     stars: 0,
     isCompleted: false,
   });
+
+  useEffect(() => {
+    const modeParam = searchParams.get("mode");
+    if (modeParam && TYPING_MODES.some(m => m.id === modeParam)) {
+      setCurrentMode(modeParam);
+    }
+  }, [searchParams]);
 
   const handleMouseMove = useCallback((e: MouseEvent) => {
     setMousePosition((prev) => {
@@ -126,11 +139,10 @@ export default function TypingGamePage() {
   return (
     <div className="font-sans relative min-h-screen w-full overflow-y-auto overflow-x-hidden" style={{ minHeight: '100dvh' }}>
       {/* Animated Background */}
-      {/* Animated Background - Light Theme */}
-      <div className="absolute inset-0 bg-gray-50">
-        {/* Floating orbs - Subtle for light theme */}
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
+        {/* Floating orbs */}
         <div
-          className="absolute w-96 h-96 bg-blue-200/30 rounded-full blur-3xl animate-pulse"
+          className="absolute h-64 w-64 animate-pulse rounded-full bg-purple-500/20 blur-3xl sm:h-80 sm:w-80 lg:h-96 lg:w-96"
           style={{
             left:
               typeof window !== "undefined"
@@ -143,7 +155,7 @@ export default function TypingGamePage() {
           }}
         />
         <div
-          className="absolute w-80 h-80 bg-purple-200/30 rounded-full blur-3xl animate-pulse delay-1000"
+          className="absolute h-56 w-56 animate-pulse rounded-full bg-blue-500/20 blur-3xl delay-1000 sm:h-72 sm:w-72 lg:h-80 lg:w-80"
           style={{
             right:
               typeof window !== "undefined"
@@ -155,14 +167,31 @@ export default function TypingGamePage() {
                 : "20%",
           }}
         />
-        
-        {/* Grid pattern - Darker for visibility on light bg */}
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(0,0,0,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(0,0,0,0.03)_1px,transparent_1px)] bg-[size:50px_50px]" />
+        <div
+          className="absolute h-48 w-48 animate-pulse rounded-full bg-indigo-500/20 blur-3xl delay-2000 sm:h-64 sm:w-64 lg:h-72 lg:w-72"
+          style={{
+            left:
+              typeof window !== "undefined"
+                ? `${50 + (mousePosition.x / window.innerWidth) * 5}%`
+                : "50%",
+            top:
+              typeof window !== "undefined"
+                ? `${60 + (mousePosition.y / window.innerHeight) * 5}%`
+                : "60%",
+          }}
+        />
+
+        {/* Grid pattern */}
+        <div className="absolute inset-0 hidden bg-[linear-gradient(rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[size:40px_40px] sm:block lg:bg-[size:50px_50px]" />
+
+        {/* Gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/30" />
       </div>
 
-      {/* Floating particles - Darker for light theme */}
-      <div className="absolute inset-0 pointer-events-none">
+      {/* Floating particles */}
+      <div className="pointer-events-none absolute inset-0 hidden sm:block">
         {[...Array(20)].map((_, i) => {
+          // Use deterministic values to avoid hydration mismatch
           const seed = i * 0.1;
           const left =
             Math.round((Math.sin(seed) * 0.5 + 0.5) * 100 * 100) / 100;
@@ -176,7 +205,7 @@ export default function TypingGamePage() {
           return (
             <div
               key={i}
-              className="absolute w-1 h-1 bg-blue-500/20 rounded-full animate-pulse"
+              className="absolute w-1 h-1 bg-white/30 rounded-full animate-pulse"
               style={{
                 left: `${left}%`,
                 top: `${top}%`,
@@ -253,14 +282,14 @@ export default function TypingGamePage() {
               <VirtualKeyboardToggleButton />
             </div>
               <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                <div className="flex items-center gap-3 text-gray-600 text-sm">
+                <div className="flex items-center gap-3 text-gray-300 text-sm">
                   <Link
                     href="/"
-                    className="rounded-full border border-gray-300 px-3 py-1 text-gray-600 hover:border-gray-400 hover:text-gray-900 transition"
+                    className="rounded-full border border-white/20 px-3 py-1 text-gray-300 hover:border-white/40 hover:text-white transition"
                   >
                     ⬅️ 返回首页
                   </Link>
-                  <span className="hidden md:block text-gray-300">|</span>
+                  <span className="hidden md:block text-white/20">|</span>
                   <span className="hidden md:block">盲打教程 · 新手到高手路线</span>
                 </div>
 
@@ -271,7 +300,7 @@ export default function TypingGamePage() {
                         <Button
                           asChild
                           variant="outline"
-                          className="border-gray-300 text-gray-700 hover:bg-gray-100"
+                          className="border-white/20 bg-white/5 text-gray-200 hover:bg-white/10 hover:text-white"
                         >
                           <Link href="/profile" className="flex items-center gap-2">
                             <UserRound className="h-4 w-4" />
@@ -279,7 +308,7 @@ export default function TypingGamePage() {
                           </Link>
                         </Button>
                       ) : (
-                        <Button asChild variant="ghost" className="text-gray-600 hover:text-gray-900 hover:bg-gray-100">
+                        <Button asChild variant="ghost" className="text-gray-300 hover:text-white hover:bg-white/10">
                           <Link href="/login" className="flex items-center gap-2">
                             <LogIn className="h-4 w-4" />
                             <span className="hidden sm:inline">登录</span>
@@ -313,19 +342,20 @@ export default function TypingGamePage() {
                       }
                     }, 50);
                   }}
-                  className="p-2.5 sm:p-3 bg-white hover:bg-gray-50 rounded-full border border-gray-200 hover:border-gray-300 transition-all transform hover:scale-110 active:scale-95 cursor-pointer shadow-sm touch-manipulation"
+                  className="p-2.5 sm:p-3 bg-white/10 hover:bg-white/20 rounded-full border border-white/10 hover:border-white/30 transition-all transform hover:scale-110 active:scale-95 cursor-pointer shadow-sm touch-manipulation backdrop-blur-sm"
                   title={`当前模式: ${TYPING_MODES.find((m) => m.id === currentMode)?.name || currentMode} - 点击跳转到游戏区域`}
                 >
                   <span className="text-2xl sm:text-3xl block">
                     {TYPING_MODES.find((m) => m.id === currentMode)?.name.split(" ")[0] || "⌨️"}
                   </span>
                 </button>
-                <div className="flex items-center justify-center">
+                <div className="flex items-center justify-center gap-2">
                   <VirtualKeyboardToggleButton />
+                  <ModeToggle />
                 </div>
               </div>
               <div className="w-24 h-1 bg-gradient-to-r from-purple-500 to-blue-500 mx-auto mb-8" />
-              <p className="text-gray-600 text-lg">
+              <p className="text-gray-300 text-lg">
                 Improve your typing speed and accuracy
               </p>
               <SmoothCursor enabled={!isGamePlaying} />
@@ -346,6 +376,7 @@ export default function TypingGamePage() {
               {currentMode === "accuracy" && <AccuracyMode />}
               {currentMode === "code" && <CodeMode />}
               {currentMode === "quote" && <QuoteMode />}
+              {currentMode === "book" && <BookMode />}
               {currentMode === "custom" && <CustomMode />}
             </div>
 
@@ -360,10 +391,10 @@ export default function TypingGamePage() {
             </div>
 
             {/* Back Button */}
-            <div className="mt-12 pt-8 border-t border-gray-200 text-center">
+            <div className="mt-12 pt-8 border-t border-white/10 text-center">
               <Link
                 href="/"
-                className="group inline-flex items-center gap-2 px-8 py-3 bg-white text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-full border border-gray-300 hover:border-gray-400 transition-all duration-300 transform hover:scale-105 hover:shadow-md"
+                className="group inline-flex items-center gap-2 px-8 py-3 bg-white/10 text-white hover:bg-white/20 rounded-full border border-white/10 hover:border-white/30 transition-all duration-300 transform hover:scale-105 hover:shadow-md backdrop-blur-sm"
               >
                 <span className="group-hover:-translate-x-1 transition-transform duration-300">
                   ←
@@ -389,5 +420,13 @@ export default function TypingGamePage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function TypingGamePage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <TypingGameContent />
+    </Suspense>
   );
 }

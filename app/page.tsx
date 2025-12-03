@@ -27,6 +27,37 @@ function ProfilePhoto() {
   return null;
 }
 
+
+function HomeHeader() {
+  const { isAuthenticated, isLoading } = useAuth();
+
+  return (
+    <header className="absolute top-0 left-0 right-0 z-50 flex items-center justify-end gap-4 p-6 sm:p-10 pointer-events-none">
+      <div className="pointer-events-auto flex items-center gap-4">
+        {/* KP.FACTORY Logo */}
+        <div className="flex items-center justify-center rounded-lg bg-gradient-to-br from-purple-600 to-blue-600 px-4 py-2 font-bold text-white shadow-lg backdrop-blur-sm select-none">
+          KP.FACTORY
+        </div>
+
+        {/* Personal Info / Login */}
+        {!isLoading && (
+          isAuthenticated ? (
+            <Link href="/profile" className="group relative flex items-center justify-center w-10 h-10 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white hover:bg-white/20 transition-colors">
+              <UserRound className="w-5 h-5" />
+              <span className="sr-only">个人资料</span>
+            </Link>
+          ) : (
+            <Link href="/login" className="group relative flex items-center justify-center w-10 h-10 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white hover:bg-white/20 transition-colors">
+              <LogIn className="w-5 h-5" />
+              <span className="sr-only">登录</span>
+            </Link>
+          )
+        )}
+      </div>
+    </header>
+  );
+}
+
 export default function Home() {
   const router = useRouter();
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
@@ -72,6 +103,10 @@ export default function Home() {
     <div className="font-sans relative min-h-screen min-h-[100dvh] overflow-hidden">
       {/* Analytics tracking */}
       <SimpleAnalytics page="/" />
+      
+      {/* Header with Logo and User Profile */}
+      <HomeHeader />
+
       {/* Animated Background */}
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
         {/* Floating orbs */}
@@ -208,35 +243,16 @@ export default function Home() {
             </Button>
             <Button
               asChild
+              className="w-full border-0 bg-gradient-to-r from-[#5f4b32] to-[#8c7355] text-white hover:from-[#4a3b28] hover:to-[#756146] sm:w-auto"
+            >
+              <Link href="/typing-game?mode=book">📖 Book Time</Link>
+            </Button>
+            <Button
+              asChild
               className="w-full border-0 bg-gradient-to-r from-purple-600 to-blue-600 text-white hover:from-purple-700 hover:to-blue-700 sm:w-auto"
             >
               <Link href="/access">how to access</Link>
             </Button>
-            {!authLoading && (
-              <>
-                {isAuthenticated ? (
-                  <Button
-                    asChild
-                    className="w-full border-0 bg-gradient-to-r from-pink-600 to-rose-600 text-white hover:from-pink-700 hover:to-rose-700 sm:w-auto"
-                  >
-                    <Link href="/profile" className="flex items-center gap-2">
-                      <UserRound className="h-4 w-4" />
-                      <span>个人资料</span>
-                    </Link>
-                  </Button>
-                ) : (
-                  <Button
-                    asChild
-                    className="w-full border-0 bg-gradient-to-r from-pink-600 to-rose-600 text-white hover:from-pink-700 hover:to-rose-700 sm:w-auto"
-                  >
-                    <Link href="/login" className="flex items-center gap-2">
-                      <LogIn className="h-4 w-4" />
-                      <span>登录</span>
-                    </Link>
-                  </Button>
-                )}
-              </>
-            )}
           </div>
         </main>
         <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center"></footer>
@@ -244,3 +260,4 @@ export default function Home() {
     </div>
   );
 }
+
