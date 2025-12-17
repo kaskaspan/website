@@ -13,7 +13,7 @@ import { AccuracyMode } from "@/components/game/AccuracyMode";
 import { CodeMode } from "@/components/game/CodeMode";
 import { QuoteMode } from "@/components/game/QuoteMode";
 import { CustomMode } from "@/components/game/CustomMode";
-import { BookMode } from "@/components/game/BookMode";
+import { BookMode } from "@/app/book /BookMode";
 
 // 打字模式列表
 const TYPING_MODES = [
@@ -376,7 +376,7 @@ function TypingGameContent() {
               {currentMode === "accuracy" && <AccuracyMode />}
               {currentMode === "code" && <CodeMode />}
               {currentMode === "quote" && <QuoteMode />}
-              {currentMode === "book" && <BookMode />}
+              {currentMode === "book" && <BookMode text={""} />}
               {currentMode === "custom" && <CustomMode />}
             </div>
 

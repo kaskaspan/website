@@ -59,46 +59,67 @@
 
 /* Book Mode Styles */
 .bookMode {
-  --bg-primary: #fdf6e3;
-  --bg-card: #fdf6e3;
-  --color-text: #5f4b32;
-  --color-muted: #a69b8d;
-  --color-correct: #268bd2;
-  --color-error: #dc322f;
-  --color-current: #b58900;
+  --bg-primary: #fdfbf7;
+  --bg-card: #fdfbf7;
+  --color-text: #333333;
+  --color-muted: #8e8e93;
+  --color-correct: #34c759; /* Apple Green */
+  --color-error: #ff3b30;   /* Apple Red */
+  --color-current: #007aff; /* Apple Blue */
   
-  font-family: "Georgia", "Times New Roman", serif;
-  line-height: 1.8;
+  font-family: "Charter", "Bitstream Charter", "Sitka Text", "Cambria", "Georgia", serif;
+  line-height: 1.9;
+  -webkit-font-smoothing: antialiased;
 }
 
 .bookMode .container {
   background: var(--bg-card);
   box-shadow: 
-    0 4px 6px -1px rgba(0, 0, 0, 0.1),
-    0 2px 4px -1px rgba(0, 0, 0, 0.06),
-    inset 20px 0 50px -10px rgba(0, 0, 0, 0.05); /* Spine effect */
-  border: 1px solid #e6dcc3;
-  max-width: 900px;
+    0 20px 40px -10px rgba(0, 0, 0, 0.08),
+    0 0 0 1px rgba(0, 0, 0, 0.03);
+  border: none;
+  max-width: 800px;
   color: var(--color-text);
+  padding: 4rem 5rem;
+  position: relative;
+}
+
+/* Mobile adjustments */
+@media (max-width: 640px) {
+  .bookMode .container {
+    padding: 2rem 1.5rem;
+  }
 }
 
 .bookMode .lesson {
   color: var(--color-muted);
-  font-size: 1.6rem;
+  font-size: 1.35rem;
+  letter-spacing: -0.01em;
 }
 
 .bookMode .correct {
-  color: var(--color-correct);
+  color: var(--color-text); /* In books, read text is just text, maybe slightly darker? Or keep it black */
+  /* Actually, for typing game, we still need to know what we typed. 
+     Let's make typed text fully opaque black, and untyped text gray. */
+  color: #1a1a1a;
 }
 
 .bookMode .current {
-  background-color: rgba(181, 137, 0, 0.2);
+  background-color: transparent;
   color: var(--color-current);
-  box-shadow: 0 0 0 1px var(--color-current);
+  text-decoration: underline;
+  text-decoration-color: var(--color-current);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+  box-shadow: none;
+  border-radius: 0;
 }
 
 .bookMode .currentError {
-  background-color: rgba(220, 50, 47, 0.2);
+  background-color: transparent;
   color: var(--color-error);
-  box-shadow: 0 0 0 1px var(--color-error);
+  text-decoration: underline;
+  text-decoration-style: wavy;
+  text-decoration-color: var(--color-error);
+  box-shadow: none;
 }

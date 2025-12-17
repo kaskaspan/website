@@ -89,6 +89,12 @@ export function SupabaseLoginForm() {
         } else {
           // 提供更友好的错误消息
           let errorMessage = result.message;
+          console.log('Signup Result:', result); // Log full result
+          
+          if (errorMessage.includes('Database error')) {
+             alert('详细错误: ' + JSON.stringify(result, null, 2));
+          }
+
           if (errorMessage.includes('invalid') || errorMessage.includes('Email')) {
             errorMessage = '邮箱地址格式不正确，请检查拼写（例如：gmail.com 不是 gamil.com）';
           } else if (errorMessage.includes('already registered') || errorMessage.includes('already exists')) {

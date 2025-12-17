@@ -83,7 +83,7 @@ export const lessonTracks: LessonTrack[] = [
     lessons: [
       {
         id: "book-world-end",
-        title: "世界末日",
+        title: "Kasper Wonder Diary",
         estimatedMinutes: 60,
         tags: ["story", "long-form"],
         contentRef: "content-book-world-end",

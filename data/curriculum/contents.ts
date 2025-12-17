@@ -107,7 +107,7 @@ export const lessonContents: LessonContent[] = [
       locale: "zh-CN",
       keyboardLayout: "qwerty",
       modules: [
-        { type: "exercise", id: "exercise-fj-words", title: "基准键词组", textBlocks: [["fj", "jf", "ffjj", "jjff"]] www},
+        { type: "exercise", id: "exercise-fj-words", title: "基准键词组", textBlocks: [["fj", "jf", "ffjj", "jjff"]] },
         { type: "exercise", id: "exercise-kd-words", title: "延伸键词组", textBlocks: [["kd", "dk", "kkdd", "ddkk"]] },
         { type: "exercise", id: "exercise-ls-words", title: "中指词组", textBlocks: [["ls", "sl", "llss", "ssll"]] },
         { type: "exercise", id: "exercise-a;-words", title: "无名指词组", textBlocks: [["a;", ";a", "aa;;", ";;aa"]] },

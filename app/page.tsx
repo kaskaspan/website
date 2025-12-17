@@ -217,12 +217,19 @@ export default function Home() {
             I&apos;m building my world.
           </TypingAnimation>
           <div className="flex w-full max-w-3xl flex-col gap-3 sm:flex-row sm:flex-wrap sm:justify-center">
-            <Button
-              onClick={handleClick}
-              className="w-full border-0 bg-gradient-to-r from-purple-600 to-blue-600 text-white hover:from-purple-700 hover:to-blue-700 sm:w-auto"
-            >
-              about me
-            </Button>
+              {/* About Me button redirects to profile if logged in, otherwise to login with redirect */}
+              <Button
+                onClick={() => {
+                  if (isAuthenticated) {
+                    router.push('/profile');
+                  } else {
+                    router.push('/login?redirect=/profile');
+                  }
+                }}
+                className="w-full border-0 bg-gradient-to-r from-purple-600 to-blue-600 text-white hover:from-purple-700 hover:to-blue-700 sm:w-auto"
+              >
+                My Profile
+              </Button>
             <Button
               asChild
               className="w-full border-0 bg-gradient-to-r from-purple-600 to-blue-600 text-white hover:from-purple-700 hover:to-blue-700 sm:w-auto"

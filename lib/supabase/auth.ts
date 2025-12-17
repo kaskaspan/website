@@ -50,12 +50,12 @@ export async function signUp(email: string, password: string, username: string) 
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
-    options: {
-      data: {
-        username,
-      },
-      emailRedirectTo: redirectTo,
-    },
+    // options: {
+    //   data: {
+    //     username,
+    //   },
+    //   emailRedirectTo: redirectTo,
+    // },
   })
 
   if (error) {
@@ -152,14 +152,14 @@ async function createUserProfile(userId: string, username: string, email?: strin
   
   const { error } = await supabase
     .from('user_profiles')
-    .insert({
+    .upsert({
       id: userId,
       username,
       email,
     })
   
   if (error) {
-    console.error('创建用户档案错误:', error)
+    console.error('创建用户档案错误 details:', JSON.stringify(error, null, 2))
     return
   }
   

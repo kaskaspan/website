@@ -30,6 +30,7 @@ import {
 } from "@/store/slices";
 import type { SessionSummary, LessonContent } from "@/types";
 import Link from "next/link";
+import { extractLessonText } from "@/lib/lesson-utils";
 
 // ------------------------------------------------------------------
 // Constants used for the UI guides and milestones
@@ -559,7 +560,7 @@ export function TypingGame({
                   </div>
                   <p className="text-lg font-medium text-gray-600">点击开始练习</p>
                   {mode === "book" && (
-                    <p className="text-sm text-[#5f4b32]/80 font-serif italic">"阅读是另一种呼吸"</p>
+                    <p className="text-sm text-[#5f4b32]/80 font-serif italic">&quot;阅读是另一种呼吸&quot;</p>
                   )}
                 </div>
               ) : (
@@ -666,35 +667,4 @@ export function TypingGame({
 }
 
 // ------------------------------------------------------------------
-// Helper: turn lesson content into plain text for the typing game
-function extractLessonText(content?: LessonContent) {
-  if (!content) return "";
-  const segments: string[] = [];
-  for (const lessonModule of content.modules) {
-    switch (lessonModule.type) {
-      case "drill": {
-        const repeated = Array(lessonModule.repetitions)
-          .fill(lessonModule.text)
-          .join(" ");
-        segments.push(repeated);
-        break;
-      }
-      case "exercise": {
-        const blockText = lessonModule.textBlocks.flat().join(" ");
-        segments.push(blockText);
-        break;
-      }
-      case "challenge": {
-        segments.push(
-          `${lessonModule.title ?? "挑战"}，目标 ${lessonModule.targetWPM} WPM，时长 ${lessonModule.durationSec} 秒`
-        );
-        break;
-      }
-      case "test": {
-        segments.push(lessonModule.questionPool.join(" "));
-        break;
-      }
-    }
-  }
-  return segments.join(" ").replace(/\s+/g, " ").trim();
-}
+// Helper moved to @/lib/lesson-utils.ts
