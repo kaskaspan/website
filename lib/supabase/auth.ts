@@ -63,8 +63,8 @@ export async function signUp(email: string, password: string, username: string) 
   }
 
   if (data.user) {
-    // 创建用户档案
-    await createUserProfile(data.user.id, username, email)
+    // 创建用户档案 - 由于需要邮箱验证，必须由数据库触发器处理
+    // await createUserProfile(data.user.id, username, email)
     
     return {
       success: true,
@@ -142,7 +142,7 @@ async function ensureUserProfile(user: User) {
   
   if (!existing) {
     const username = user.user_metadata?.username || user.email?.split('@')[0] || '用户'
-    await createUserProfile(user.id, username, user.email)
+    // await createUserProfile(user.id, username, user.email)
   }
 }
 

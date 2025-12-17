@@ -1,6 +1,6 @@
 // filename: components/BookMode.tsx
 import React, { useState, useMemo, useEffect } from "react";
-import "../styles/book-mode.css";
+import "./book-mode.css";
 import { getDiaryEntry } from "./diary";
 /**
  * BookMode renders reading UI like Apple Books.
