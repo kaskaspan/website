@@ -1,5 +1,6 @@
 // filename: components/BookMode.tsx
 import React, { useState, useMemo, useEffect } from "react";
+import { Volume2, Square } from "lucide-react";
 import "./book-mode.css";
 import { getDiaryEntry } from "./diary";
 /**
@@ -19,6 +20,13 @@ export function BookMode({
   const [size, setSize] = useState<number>(18);
   const [line, setLine] = useState<number>(1.6);
   const [diary, setDiary] = useState<{ title: string; text: string } | null>(null);
+  const [isReading, setIsReading] = useState(false);
+  
+  useEffect(() => {
+    return () => {
+      window.speechSynthesis.cancel();
+    };
+  }, []);
   
   // Load diary entry on mount if not provided via props
   useEffect(() => {
@@ -55,6 +63,24 @@ export function BookMode({
   const paragraphs = useMemo(() => displayText.split(/\r?\n/), [displayText]);
   const chunks = useMemo(() => chunkText(displayText, 3), [displayText]);
 
+  const toggleReadAloud = () => {
+    if (isReading) {
+      window.speechSynthesis.cancel();
+      setIsReading(false);
+    } else {
+      const utterance = new SpeechSynthesisUtterance(displayText);
+      // Try to select a "Google US English" voice or similar if available, otherwise default
+      // const voices = window.speechSynthesis.getVoices();
+      // utterance.voice = voices.find(v => v.name.includes("Google US English")) || null;
+      
+      utterance.pitch = 1;
+      utterance.rate = 1;
+      utterance.onend = () => setIsReading(false);
+      window.speechSynthesis.speak(utterance);
+      setIsReading(true);
+    }
+  };
+
   // CSS custom properties – no `any` needed
   const bookStyle = {
     "--book-font-size": `${size}px`,
@@ -79,6 +105,16 @@ export function BookMode({
           <button className="book-btn" aria-pressed={line === 1.4} onClick={() => setLine(1.4)}>Compact</button>
           <button className="book-btn" aria-pressed={line === 1.6} onClick={() => setLine(1.6)}>Comfort</button>
           <button className="book-btn" aria-pressed={line === 1.8} onClick={() => setLine(1.8)}>Relaxed</button>
+          
+          <div className="h-8 w-px mx-1" />
+          
+          <button 
+            className={`book-btn ${isReading ? "text-blue-600" : ""}`} 
+            onClick={toggleReadAloud}
+            title={isReading ? "Stop Reading" : "Read Aloud"}
+          >
+            {isReading ? <Square size={16} fill="currentColor" /> : <Volume2 size={18} />}
+          </button>
           <div className="h-8 w-px mx-1" />
           <button
             onClick={handleSave}

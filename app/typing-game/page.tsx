@@ -139,6 +139,8 @@ function TypingGameContent() {
   return (
     <div className="font-sans relative min-h-screen w-full overflow-y-auto overflow-x-hidden" style={{ minHeight: '100dvh' }}>
       {/* Animated Background */}
+      {/* Animated Background - Only shown if NOT in book mode */}
+      {currentMode !== "book" && (
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
         {/* Floating orbs */}
         <div
@@ -187,8 +189,11 @@ function TypingGameContent() {
         {/* Gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/30" />
       </div>
+      )}
 
-      {/* Floating particles */}
+      
+      {/* Floating particles - Only if NOT in book mode */}
+      {currentMode !== "book" && (
       <div className="pointer-events-none absolute inset-0 hidden sm:block">
         {[...Array(20)].map((_, i) => {
           // Use deterministic values to avoid hydration mismatch
@@ -216,15 +221,18 @@ function TypingGameContent() {
           );
         })}
       </div>
+      )}
 
       {/* Content */}
       <div className="relative z-10 min-h-screen w-full flex">
         {/* Desktop Left Sidebar */}
         <div className="hidden lg:block relative z-50">
+          {currentMode !== "book" && (
           <TypingGameSidebar
             currentMode={currentMode}
             onModeSelect={setCurrentMode}
           />
+          )}
         </div>
 
         {/* Mobile Sidebar Overlay */}
@@ -264,7 +272,7 @@ function TypingGameContent() {
 
         {/* Main Content */}
         <div 
-          className="flex-1 w-full p-4 sm:p-6 md:p-8 lg:p-12 gap-16"
+          className={`flex-1 w-full gap-16 ${currentMode === "book" ? "p-0" : "p-4 sm:p-6 md:p-8 lg:p-12"}`}
           style={{
             paddingBottom: isKeyboardOpen ? 'calc(25vh + 2rem)' : '5rem',
             transition: 'padding-bottom 0.3s ease-out',
@@ -320,6 +328,7 @@ function TypingGameContent() {
                 </div>
               </div>
 
+            {currentMode !== "book" && (
             <div className="text-center mb-6 sm:mb-8">
               <h1 className="mb-3 sm:mb-4">
                 <TypingAnimation
@@ -360,6 +369,7 @@ function TypingGameContent() {
               </p>
               <SmoothCursor enabled={!isGamePlaying} />
             </div>
+            )}
 
             {/* Game Component */}
             <div className="w-full" data-typing-game-container>
@@ -407,6 +417,7 @@ function TypingGameContent() {
 
         {/* Right Sidebar */}
         <div className="hidden xl:block relative z-50">
+          {currentMode !== "book" && (
           <TypingGameRightSidebar
             wpm={gameStats.wpm}
             accuracy={gameStats.accuracy}
@@ -417,6 +428,7 @@ function TypingGameContent() {
             stars={gameStats.stars}
             isCompleted={gameStats.isCompleted}
           />
+          )}
         </div>
       </div>
     </div>

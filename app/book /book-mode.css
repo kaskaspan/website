@@ -1,0 +1,130 @@
+/* Apple Books-inspired styling */
+.book-mode {
+  --book-bg: #fcfcfc;
+  --book-text: #333;
+  --book-accent: #007aff;
+  --book-font-family: "Charter", "Iowan Old Style", "Sitka Text", Palatino, serif;
+  font-family: var(--book-font-family);
+  background-color: var(--book-bg);
+  color: var(--book-text);
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Themes */
+.book-mode.book--sepia {
+  --book-bg: #f5f1e8;
+  --book-text: #5f4b32;
+}
+
+.book-mode.book--night {
+  --book-bg: #1a1a1a;
+  --book-text: #ccc;
+}
+
+.book-mode.book--light {
+  --book-bg: #ffffff;
+  --book-text: #111;
+}
+
+/* Topbar */
+.book-topbar {
+  flex: 0 0 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+  background-color: inherit;
+  font-family: system-ui, -apple-system, sans-serif;
+  z-index: 10;
+}
+
+.book-mode.book--night .book-topbar {
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.book-title {
+  font-weight: 500;
+  font-size: 0.9rem;
+  opacity: 0.7;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 50%;
+}
+
+.book-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.book-btn {
+  background: none;
+  border: none;
+  font-size: 0.85rem;
+  cursor: pointer;
+  padding: 6px 10px;
+  border-radius: 6px;
+  color: inherit;
+  opacity: 0.7;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.book-btn:hover {
+  background-color: rgba(0,0,0,0.05);
+  opacity: 1;
+}
+
+.book-mode.book--night .book-btn:hover {
+  background-color: rgba(255,255,255,0.1);
+}
+
+.book-btn[aria-pressed="true"] {
+  background-color: rgba(0,0,0,0.1);
+  font-weight: 600;
+  opacity: 1;
+}
+
+.book-mode.book--night .book-btn[aria-pressed="true"] {
+  background-color: rgba(255,255,255,0.2);
+}
+
+/* Content Area */
+.book-page {
+  flex: 1;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+  padding: 40px 20px 100px;
+  display: flex;
+  justify-content: center;
+}
+
+.book-content {
+  max-width: 700px;
+  width: 100%;
+  font-size: var(--book-font-size, 18px);
+  line-height: var(--book-line-height, 1.6);
+  margin: 0 auto;
+}
+
+.book-content p {
+  margin-bottom: 1.5em;
+  text-indent: 1.5em;
+}
+
+.book-content p:first-of-type {
+  text-indent: 0;
+}

@@ -252,7 +252,7 @@ export default function Home() {
               asChild
               className="w-full border-0 bg-gradient-to-r from-[#5f4b32] to-[#8c7355] text-white hover:from-[#4a3b28] hover:to-[#756146] sm:w-auto"
             >
-              <Link href="/typing-game?mode=book">📖 Book Time</Link>
+              <Link href="/wechat-tts">📖 WeChat Reader</Link>
             </Button>
             <Button
               asChild
